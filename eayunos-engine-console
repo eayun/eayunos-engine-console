@@ -62,8 +62,15 @@ To manage your appliance please browse to Web Portal.
 	Engine Version:		$OVEVER
 	Engine State:		$OVESTATE
 	Web Portal:		http://$IPADDR
-
 "
+if [ -e /.eayunos/engineadminpw ]; then
+   INITPW=`head -1 /.eayunos/engineadminpw`
+   echo -n -e "\033[33m[NOTICE]:\033[0m "
+   echo "The initial password of Web Portal admin is $INITPW "
+   echo -n -e "\033[31m[WARNING]:\033[0m "
+   echo "Please change the Web Portal admin's password."
+fi
+echo
 echo -n "Press any key to continue."
 read -n1
 ADV_SET
@@ -398,6 +405,57 @@ ADV_SET
 
 }
 
+RESET_ADMINPW(){
+
+printf "\033c"
+read -sp "New password :" SETNEWADMPWD
+if [ -z $SETNEWADMPWD ]; then
+   echo
+   echo -n "Password cannot be empty. Press any key to continue."
+   read -n1
+   RESET_ADMINPW
+fi
+echo
+read -sp "Retype new password :" SETRETNEWADMPWD
+if [ -z $SETRETNEWADMPWD ]; then
+   echo
+   echo -n "Sorry, passwords do not match. Press any key to try again."
+   read -n1
+   RESET_ADMINPW
+fi
+echo
+while true ; do
+   if [ $SETNEWADMPWD != $SETRETNEWADMPWD ]; then
+      echo -n "Sorry, passwords do not match. Press any key to try again."
+      read -n1
+      RESET_ADMINPW
+   else
+      sudo sh -c "echo $SETNEWADMPWD > /.eayunos/newpas" &> /dev/null
+      sudo engine-config -s AdminPassword --admin-pass-file=/.eayunos/newpas &> /dev/null
+      rm -rf /.eayunos/newpas
+      if [ $? -eq 0 ]; then
+         sudo service ovirt-engine restart &> /dev/null
+         if [ $? -eq 0 ]; then
+            rm -rf /.eayunos/engineadminpw
+            echo -n "Password change successfully. Press any key to continue."
+            read -n1
+            break
+         else
+            echo -n "Password change failed. Press any key to continue."
+            read -n1
+            break
+         fi
+      else
+         echo -n "Password change failed. Press any key to continue."
+         read -n1
+         break
+      fi
+   fi
+done
+ADV_SET
+
+}
+
 ENGINE_ADVANCE_CONF(){
 ##
 #Cleanup the Engine configuration and reconfiguration
@@ -409,7 +467,8 @@ echo
 echo "
 1) Engine Cleanup !
 2) Engine Setup !
-3) Back
+3) Reset Web Portal admin password !
+4) Back
 "
 echo 
 read -p "Choose the advanced setting: " ENGADVCONF
@@ -437,6 +496,9 @@ case $ENGADVCONF in
    ENGINE_ADVANCE_CONF
 ;;
 3)
+   RESET_ADMINPW 
+;;
+4)
    ADV_SET
 ;;
 *)
