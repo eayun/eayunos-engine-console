@@ -297,63 +297,63 @@ ADV_SET
 
 }
 
-HOSTNAME_CHECK(){
+##HOSTNAME_CHECK(){
+####
+###Check the host name is not "localhost.localdomain"
+####
 ##
-#Check the host name is not "localhost.localdomain"
+##echo
+##if [ $HOSTNAME == "localhost.localdomain" ];then
+##   echo -n 'We do not recommend using "localhost.localdomain" as the hostname. 
+##Please modify the hostname. Press any key to continue.'
+##   read -n1
+##   ADV_SET
+##fi
 ##
+##}
 
-echo
-if [ $HOSTNAME == "localhost.localdomain" ];then
-   echo -n 'We do not recommend using "localhost.localdomain" as the hostname. 
-Please modify the hostname. Press any key to continue.'
-   read -n1
-   ADV_SET
-fi
-
-}
-
-ENGINE_INIT(){
+##ENGINE_INIT(){
+####
+###When modify the hostname call the ovirt-engine-rename script to regenerate the apache certificate.
+####
 ##
-#When modify the hostname call the ovirt-engine-rename script to regenerate the apache certificate.
+##printf "\033c"
 ##
-
-printf "\033c"
-
-HOSTNAME_CHECK
-echo
-if [ -e /.eayunos/engine-init.lock ]; then
-   echo -n "Engine already initialized. Press any key to continue."
-   read -n1
-   ADV_SET
-else 
-   read -p "Engine Initailization (Y/N): " ENGINIYN
-   while true; do
-      if [ -z $ENGINIYN ]; then
-         read -p "Engine Initailization (Y/N): " ENGINIYN
-      elif [ $ENGINIYN == Y ] || [ $ENGINIYN == y ];then
-#         engine init
-         sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$HOSTNAME
-         if [ $? -eq 0 ]; then
-	    echo -n "Engine initialized successfully. Press any key to continue."
-	    read -n1
-            sudo mkdir /.eayunos &> /dev/null
-            sudo touch /.eayunos/engine-init.lock &> /dev/null
-	 else
-	    echo -n "Engine initialized failed. Press any key to continue."
-            read -n1
-         fi
-         break
-      elif [ $ENGINIYN == N ] || [ $ENGINIYN == n ];then
-         ADV_SET
-         break
-      else
-         read -p "Engine Initailization (Y/N): " ENGINIYN
-      fi
-   done
-   ADV_SET
-fi
-
-}
+##HOSTNAME_CHECK
+##echo
+##if [ -e /.eayunos/engine-init.lock ]; then
+##   echo -n "Engine already initialized. Press any key to continue."
+##   read -n1
+##   ADV_SET
+##else 
+##   read -p "Engine Initailization (Y/N): " ENGINIYN
+##   while true; do
+##      if [ -z $ENGINIYN ]; then
+##         read -p "Engine Initailization (Y/N): " ENGINIYN
+##      elif [ $ENGINIYN == Y ] || [ $ENGINIYN == y ];then
+###         engine init
+##         sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$HOSTNAME
+##         if [ $? -eq 0 ]; then
+##	    echo -n "Engine initialized successfully. Press any key to continue."
+##	    read -n1
+##            sudo mkdir /.eayunos &> /dev/null
+##            sudo touch /.eayunos/engine-init.lock &> /dev/null
+##	 else
+##	    echo -n "Engine initialized failed. Press any key to continue."
+##            read -n1
+##         fi
+##         break
+##      elif [ $ENGINIYN == N ] || [ $ENGINIYN == n ];then
+##         ADV_SET
+##         break
+##      else
+##         read -p "Engine Initailization (Y/N): " ENGINIYN
+##      fi
+##   done
+##   ADV_SET
+##fi
+##
+##}
 
 ENGINE_RESTART(){
 ##
