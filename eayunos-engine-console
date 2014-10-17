@@ -1,0 +1,592 @@
+#!/bin/bash
+
+##
+# EayunOS Engine Management Tools. 
+# By:zhe.ma@eayun.com
+##
+
+#Product infomation
+EAYUNOS_VERSION=4.1
+
+GET_SYS_INFO(){
+##
+#Get system info
+##
+
+HOSTNAME=`hostname`
+ACTNIC=`sudo ip link | grep "state UP" | awk '{print $2}' | cut -d ":" -f 1`
+IPADDR=`sudo ifconfig $ACTNIC | grep "inet addr" | awk '{print $2}' | cut -d ":" -f 2`
+NETMASK=`sudo ifconfig $ACTNIC | grep "inet addr" | awk '{print $4}' | cut -d ":" -f 2`
+GATEWAY=`sudo route -n | grep "^0.0.0.0" | awk '{print $2}'`
+DNS1=`sudo cat /etc/resolv.conf | head -1 | awk '{print $2}'`
+MAC=`sudo ifconfig $ACTNIC | grep "HWaddr" | awk '{print $5}'`
+SYSTIME=`sudo date`
+#  Get ovirt-engine run status 
+OVESTATE=UNKNOWN
+OVEVER=`sudo rpm -q ovirt-engine | cut -d "-" -f 3`
+if ! [ -z $OVEVER ];then
+   sudo service ovirt-engine status | grep -q "is running"
+   if [ $? -eq 0 ];then
+      OVESTATE=Running
+   else
+      OVESTATE=Stop
+   fi
+else
+   OVEVER="Not Install"
+fi
+
+}
+
+SUM_INFO(){
+##
+#Print Summary Information
+##
+
+printf "\033c"
+
+GET_SYS_INFO
+
+echo "
+Welcome to the EayunOS $EAYUNOS_VERSION Engine Appliance.
+
+To manage your appliance please browse to Web Portal.
+
+	Hostname:		$HOSTNAME
+	IP Address:		$IPADDR
+	Netmask:		$NETMASK
+	Gateway:		$GATEWAY
+	DNS:	 		$DNS1
+	MAC Address:		$MAC
+	System Time:		$SYSTIME
+	
+	Engine Version:		$OVEVER
+	Engine State:		$OVESTATE
+	Web Portal:		http://$IPADDR
+
+"
+echo -n "Press any key to continue."
+read -n1
+ADV_SET
+
+}
+
+CHECK_IP(){
+##
+#IP address validity check
+##   
+
+CHKIPRET=false
+if [ -z $CHECKIP ] &> /dev/null; then
+   CHKIPRET=true
+else
+   sudo ipcalc -c $CHECKIP &> /dev/null
+   if [ $? -eq 0 ]; then
+      CHKIPRET=true
+   else
+      CHKIPRET=false
+   fi
+fi
+
+}
+
+NETWORK_CONF(){
+##
+#IP/NETMASK/GATEWAY/DNS configuration
+##
+
+printf "\033c"
+echo "Network Configuration"
+echo
+echo "Enter the new network configuration settings."
+echo
+read -p "Enter the IP Address: |$IPADDR| " SETIPADDR
+echo "SETIPADDR $SETIPADDR" > /tmp/aa.txt
+while true ; do
+   CHECKIP=$SETIPADDR
+   if [ -z $SETIPADDR ] &> /dev/null; then
+      SETIPADDR=$IPADDR
+   fi
+   CHECK_IP
+   if $CHKIPRET ; then
+      read -p "Enter the Netmask: |$NETMASK| " SETNETMASK
+      while true ; do
+         CHECKIP=$SETNETMASK
+	 if [ -z $SETNETMASK ] &> /dev/null; then
+	    SETNETMASK=$NETMASK
+	 fi
+         CHECK_IP
+         if $CHKIPRET ; then
+            read -p "Enter the Gateway: |$GATEWAY| " SETGATEWAY
+            while true ; do
+               CHECKIP=$SETGATEWAY
+	       if [ -z $SETGATEWAY ] &> /dev/null; then
+	          SETGATEWAY=$GATEWAY
+	       fi
+               CHECK_IP
+               if $CHKIPRET ; then
+                  read -p "Enter the DNS: |$DNS1| " SETDNS
+                  while true ; do
+                     CHECKIP=$SETDNS
+	             if [ -z $SETDNS ] &> /dev/null; then
+	                SETDNS=$DNS1
+	             fi
+                     CHECK_IP
+		     if $CHKIPRET ; then 
+		        sudo sed -i "s/BOOTPROTO.*/BOOTPROTO=none/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
+		        if `sudo grep -q "^IPADDR" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
+		           sudo sed -i "s/IPADDR.*/IPADDR=$SETIPADDR/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
+		        else
+		           sudo sh -c "echo "IPADDR=$SETIPADDR" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
+	      	        fi
+		        if `sudo grep -q "^NETMASK" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
+		           sudo sed -i "s/NETMASK.*/NETMASK=$SETNETMASK/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
+		        else
+		           sudo sh -c "echo "NETMASK=$SETNETMASK" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
+		        fi
+		        if `sudo grep -q "^GATEWAY" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
+		           sudo sed -i "s/GATEWAY.*/GATEWAY=$SETGATEWAY/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
+		        else
+		           sudo sh -c "echo "GATEWAY=$SETGATEWAY" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
+		        fi
+		        if `sudo grep -q "^DNS1" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
+		           sudo sed -i "s/DNS1.*/DNS1=$SETDNS/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
+		        else
+		           sudo sh -c "echo "DNS1=$SETDNS" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
+		        fi
+	 		   sudo service network restart &> /dev/null
+                        break
+                     else
+			read -p "Enter the NNS: |$DNS1| " SETDNS
+                     fi
+                  done
+		  break
+	       else
+	          read -p "Enter the Netmask: |$GATEWAY| " SETGATEWAY
+	       fi
+            done
+            break
+         else
+            read -p "Enter the Netmask: |$NETMASK| " SETNETMASK
+         fi
+      done
+      break
+   else
+      read -p "Enter the IP Address: |$IPADDR| " SETIPADDR
+   fi
+done
+ADV_SET
+
+}
+
+SET_HOSTNAME(){
+##
+#HOSTNAME configuration
+##
+
+printf "\033c" 
+sudo sed -i "/$HOSTNAME/d" /etc/hosts
+read -p "Please enter the hostname: " SETHOSTNAME
+if ! [ -z $SETHOSTNAME ]; then
+   sudo hostname $SETHOSTNAME
+   sudo sed -i "s/^HOSTNAME.*/HOSTNAME=$SETHOSTNAME/g" /etc/sysconfig/network
+fi
+ENTRY="$IPADDR	$HOSTNAME"
+sudo sh -c "echo $ENTRY >> /etc/hosts" 
+sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$HOSTNAM --otopi-environment="OSETUP_RENAME/forceIgnoreAIAInCA=bool:'True' OVESETUP_CORE/engineStop=bool:'True' OSETUP_RENAME/confirmForceOverwrite=bool:'False'" &> /dev/null
+ADV_SET
+
+}
+
+NETWORK_TEST(){
+##
+#Network connectivity test
+##
+
+printf "\033c"
+echo "Test Network Configuration"
+echo
+while true; do
+read -p "Enter the hostname, ip address, or none to continue: " TESTADDR
+   if [ -z $TESTADDR ]; then
+      ADV_SET
+   else
+      sudo ping -c 1 $TESTADDR &> /dev/null
+      if [ $? -eq 0 ]; then
+         echo "$TESTADDR: Success!"
+      else
+         echo "$TESTADDR: Failure, Check network settings."
+      fi
+   fi
+done
+
+}
+
+SET_DATE_TIME(){
+##
+#Date and Time configuration
+##
+
+printf "\033c"
+echo "Date and Time Configuration"
+echo
+read -p "Enter the current date (YYYY-MM-DD) or \"c\" to Cancel : " SETDATE
+if [ $SETDATE == "c" ]; then
+   ADV_SET
+fi
+while true ; do
+   date -d $SETDATE "+%F" 2> /dev/null | grep -q "$SETDATE" &> /dev/null
+   if [ $? -eq 0 ];then
+      read -p "Enter the current time in 24 hour format (HH:MM:SS) or \"c\" to Cancel : " SETTIME
+      if [ $SETTIME == "c" ]; then
+         break
+      fi
+      while true ; do
+      date -d $SETTIME "+%T" 2> /dev/null | grep -q "$SETTIME" &> /dev/null
+      if [ $? -eq 0 ];then
+         printf "\033c"
+         echo "Date and Time Configuration
+
+	Date :		$SETDATE
+	Time :		$SETTIME"
+	 echo
+	 read -p "Apply Date and Time configuration? (Y/N): " YN
+	 while true ; do
+            if [ $YN == "Y" ] &> /dev/null || [ $YN == "y" ] &> /dev/null; then
+	       sudo date -s $SETDATE &> /dev/null
+	       sudo date -s $SETTIME &> /dev/null
+	       break
+            elif [ $YN == "N" ] &> /dev/null || [ $YN == "n" ] &> /dev/null; then
+	       ADV_SET
+            else
+	       echo 'Please enter "Y" or "N".'
+	       read -p "Apply Date and Time configuration? (Y/N): " YN
+            fi
+	 done
+         break
+      else
+         read -p "Enter the current time in 24 hour format (HH:MM:SS) or \"c\" to Cancel : " SETTIME
+         if [ $SETTIME == "c" ]; then
+            break
+         fi
+      fi
+      done
+      break
+   else
+      read -p "Enter the current date (YYYY-MM-DD) or \"c\" to Cancel : " SETDATE
+      if [ $SETDATE == "c" ]; then
+         break
+      fi
+   fi
+done
+ADV_SET
+
+}
+
+HOSTS_FILE(){
+##
+#Modify the /etc/hosts file
+##
+
+printf "\033c"
+sudo cp -f /etc/hosts /tmp/hosts
+sudo chown admin /tmp/hosts
+vi /tmp/hosts
+sudo cp -f /tmp/hosts /etc/hosts
+tm -rf /tmp/hosts
+ADV_SET
+
+}
+
+HOSTNAME_CHECK(){
+##
+#Check the host name is not "localhost.localdomain"
+##
+
+echo
+if [ $HOSTNAME == "localhost.localdomain" ];then
+   echo -n 'We do not recommend using "localhost.localdomain" as the hostname. 
+Please modify the hostname. Press any key to continue.'
+   read -n1
+   ADV_SET
+fi
+
+}
+
+ENGINE_INIT(){
+##
+#When modify the hostname call the ovirt-engine-rename script to regenerate the apache certificate.
+##
+
+printf "\033c"
+
+HOSTNAME_CHECK
+echo
+if [ -e /.eayunos/engine-init.lock ]; then
+   echo -n "Engine already initialized. Press any key to continue."
+   read -n1
+   ADV_SET
+else 
+   read -p "Engine Initailization (Y/N): " ENGINIYN
+   while true; do
+      if [ -z $ENGINIYN ]; then
+         read -p "Engine Initailization (Y/N): " ENGINIYN
+      elif [ $ENGINIYN == Y ] || [ $ENGINIYN == y ];then
+#         engine init
+         sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$HOSTNAME
+         if [ $? -eq 0 ]; then
+	    echo -n "Engine initialized successfully. Press any key to continue."
+	    read -n1
+            sudo mkdir /.eayunos &> /dev/null
+            sudo touch /.eayunos/engine-init.lock &> /dev/null
+	 else
+	    echo -n "Engine initialized failed. Press any key to continue."
+            read -n1
+         fi
+         break
+      elif [ $ENGINIYN == N ] || [ $ENGINIYN == n ];then
+         ADV_SET
+         break
+      else
+         read -p "Engine Initailization (Y/N): " ENGINIYN
+      fi
+   done
+   ADV_SET
+fi
+
+}
+
+ENGINE_RESTART(){
+##
+#Restart ovirt-engine service
+##
+
+printf "\033c"
+echo
+read -p "Engine Restart (Y/N): " ENGREST
+while true; do
+   if [ -z $ENGREST ]; then
+      read -p "Engine Restart (Y/N): " ENGREST
+   elif [ $ENGREST == Y ] || [ $ENGREST == y ];then
+#      echo "Engine Restart"
+      sudo service ovirt-engine restart &> /dev/null
+      if [ $? -eq 0 ]; then
+         echo -n "Engine restart successfully. Press any key to continue."
+	 read -n1
+      else
+         echo -n "Engine restart failed. Press any key to continue."
+         read -n1
+      fi
+      break
+   elif [ $ENGREST == N ] || [ $ENGREST == n ];then
+      ADV_SET
+      break
+   else
+      read -p "Engine Restart (Y/N): " ENGREST
+   fi
+done
+ADV_SET
+
+}
+
+ENGINE_ADVANCE_CONF(){
+##
+#Cleanup the Engine configuration and reconfiguration
+##
+
+printf "\033c"
+echo "Engine Advanced Configuration"
+echo
+echo "
+1) Engine Cleanup !
+2) Engine Setup !
+3) Back
+"
+echo 
+read -p "Choose the advanced setting: " ENGADVCONF
+case $ENGADVCONF in
+1)
+   sudo engine-cleanup &> /dev/null
+   if [ $? -eq 0 ]; then
+      echo "Engine Cleanup Success !"
+   else
+      echo "Engine Cleanup Failed !"
+   fi
+   echo -n "Press any key to continue."
+   read -n1
+   ENGINE_ADVANCE_CONF
+;;
+2)
+   sudo engine-setup &> /dev/null
+   if [ $? -eq 0 ]; then
+      echo "Engine Setup Success !"
+   else
+      echo "Engine Setup Failed !"
+   fi
+   echo -n "Press any key to continue."
+   read -n1
+   ENGINE_ADVANCE_CONF
+;;
+3)
+   ADV_SET
+;;
+*)
+   ENGINE_ADVANCE_CONF 
+esac
+
+}
+
+APPLIANCE_RESTART(){
+##
+#Appliance restart
+##
+
+printf "\033c"
+echo
+read -p "Restart the System (Y/N): " APPLREST
+while true; do
+   if [ -z $APPLREST ]; then
+      read -p "Restart the System (Y/N): " APPLREST
+   elif [ $APPLREST == Y ] || [ $APPLREST == y ];then
+#      echo "Restart System"
+         sudo init 6
+      break
+   elif [ $APPLREST == N ] || [ $APPLREST == n ];then
+      ADV_SET
+      break
+   else
+      read -p "Restart the System (Y/N): " APPLREST
+   fi
+done
+
+}
+
+APPLIANCE_SHUTDOWN(){
+##
+#Appliance shutdown
+##
+
+printf "\033c"
+echo
+read -p "Shutdown the System (Y/N): " APPLSHUTDOWN
+while true; do
+   if [ -z $APPLSHUTDOWN ]; then
+      read -p "Shutdown the System (Y/N): " APPLSHUTDOWN
+   elif [ $APPLSHUTDOWN == Y ] || [ $APPLSHUTDOWN == y ];then
+      sudo init 0
+      break
+   elif [ $APPLSHUTDOWN == N ] || [ $APPLSHUTDOWN == n ];then
+      ADV_SET
+      break
+   else
+      read -p "Shutdown the System (Y/N): " APPLSHUTDOWN
+   fi
+done
+
+}
+
+APPLIANCE_RESTART_SHUTDOWN(){
+##
+#Appliance Restart or Shutdown
+##
+
+printf "\033c"
+echo
+echo "Restart or Shutdown the System."
+echo "
+1) Restart the System 
+2) Shutdown the System
+3) Back
+"
+read -p "Choose the advanced setting: " RESTARTORSHUTDOWN
+case $RESTARTORSHUTDOWN in
+1)
+   APPLIANCE_RESTART
+;;
+2)
+   APPLIANCE_SHUTDOWN
+;;
+3)
+   ADV_SET
+;;
+*)
+   APPLIANCE_RESTART_SHUTDOWN
+esac
+
+}
+
+SU_ROOT(){
+##
+#Get a shell. Switch to root.
+##
+
+printf "\033c"
+sudo su root
+ADV_SET
+
+}
+
+ADV_SET(){
+##
+#Advanced Configuration Page
+##
+
+printf "\033c"
+echo "
+
+Advanced Setting
+
+1) Network Configuration
+2) Test Network Configuration
+3) Set Hostname
+4) Set Date and Time
+5) Hosts File Configuration
+6) Engine Restart
+7) Engine Advance Setting
+8) System Restart or Shutdown
+9) Shell
+10) Summary Information
+11) Log OFF
+
+"
+read -p "Choose the advanced setting: " SELNUM
+case $SELNUM in
+1)
+   NETWORK_CONF
+;;
+2)
+   NETWORK_TEST
+;;
+3)
+   SET_HOSTNAME
+;;
+4)
+   SET_DATE_TIME
+;;
+5)
+   HOSTS_FILE
+;;
+6)
+   ENGINE_RESTART
+;;
+7)
+   ENGINE_ADVANCE_CONF
+;;
+8)
+   APPLIANCE_RESTART_SHUTDOWN
+;;
+9)
+   SU_ROOT
+;;
+10)
+   SUM_INFO
+;;
+11)
+   exit
+;;
+*)
+   ADV_SET
+esac
+}
+
+#main
+SUM_INFO
