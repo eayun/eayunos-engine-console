@@ -71,7 +71,7 @@
     
     Enter the current date (YYYY-MM-DD) or "c" to Cancel : 2014-10-17
     Enter the current time in 24 hour format (HH:MM:SS) or "c" to Cancel : 13:40:00
-    
+
     Date and Time Configuration
     
     	Date :		2014-10-17
