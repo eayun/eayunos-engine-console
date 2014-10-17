@@ -138,6 +138,11 @@ while true ; do
 		        else
 		           sudo sh -c "echo "IPADDR=$SETIPADDR" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
 	      	        fi
+			if [ $IPADDR != "127.0.0.1" ]; then
+			   sudo sed -i "/$IPADDR/d" /etc/hosts
+			   HOSTSENTRY="$SETIPADDR	$HOSTNAME"
+			   sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
+			fi
 		        if `sudo grep -q "^NETMASK" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
 		           sudo sed -i "s/NETMASK.*/NETMASK=$SETNETMASK/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
 		        else
@@ -184,14 +189,19 @@ SET_HOSTNAME(){
 ##
 
 printf "\033c" 
-sudo sed -i "/$HOSTNAME/d" /etc/hosts
+if [ $HOSTNAME != "localhost.localdomain" ]; then
+   sudo sed -i "/$HOSTNAME/d" /etc/hosts
+fi
+if [ $IPADDR != "127.0.0.1" ]; then
+   sudo sed -i "/$IPADDR/d" /etc/hosts
+fi
 read -p "Please enter the hostname: " SETHOSTNAME
 if ! [ -z $SETHOSTNAME ]; then
    sudo hostname $SETHOSTNAME
    sudo sed -i "s/^HOSTNAME.*/HOSTNAME=$SETHOSTNAME/g" /etc/sysconfig/network
 fi
-ENTRY="$IPADDR	$HOSTNAME"
-sudo sh -c "echo $ENTRY >> /etc/hosts" 
+HOSTSENTRY="$IPADDR	$SETHOSTNAME"
+sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
 sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$HOSTNAM --otopi-environment="OSETUP_RENAME/forceIgnoreAIAInCA=bool:'True' OVESETUP_CORE/engineStop=bool:'True' OSETUP_RENAME/confirmForceOverwrite=bool:'False'" &> /dev/null
 ADV_SET
 
