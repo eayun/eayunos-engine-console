@@ -18,7 +18,8 @@ ACTNIC=`sudo ip link | grep "state UP" | awk '{print $2}' | cut -d ":" -f 1`
 IPADDR=`sudo ifconfig $ACTNIC | grep "inet addr" | awk '{print $2}' | cut -d ":" -f 2`
 NETMASK=`sudo ifconfig $ACTNIC | grep "inet addr" | awk '{print $4}' | cut -d ":" -f 2`
 GATEWAY=`sudo route -n | grep "^0.0.0.0" | awk '{print $2}'`
-DNS1=`sudo cat /etc/resolv.conf | head -1 | awk '{print $2}'`
+#DNS1=`sudo cat /etc/resolv.conf | head -1 | awk '{print $2}'`
+DNS1=`sudo grep '^nameserver' /etc/resolv.conf | head -1 | awk '{print $2}'`
 MAC=`sudo ifconfig $ACTNIC | grep "HWaddr" | awk '{print $5}'`
 SYSTIME=`sudo date`
 #  Get ovirt-engine run status 
@@ -107,7 +108,7 @@ echo
 echo "Enter the new network configuration settings."
 echo
 read -p "Enter the IP Address: |$IPADDR| " SETIPADDR
-echo "SETIPADDR $SETIPADDR" > /tmp/aa.txt
+#echo "SETIPADDR $SETIPADDR" > /tmp/aa.txt
 while true ; do
    CHECKIP=$SETIPADDR
    if [ -z $SETIPADDR ] &> /dev/null; then
@@ -306,7 +307,8 @@ HOSTS_FILE(){
 
 printf "\033c"
 sudo cp -f /etc/hosts /tmp/hosts
-sudo chown admin /tmp/hosts
+#sudo chown admin /tmp/hosts
+sudo chown engineadm /tmp/hosts
 vi /tmp/hosts
 sudo cp -f /tmp/hosts /etc/hosts
 tm -rf /tmp/hosts
