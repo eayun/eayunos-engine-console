@@ -434,11 +434,11 @@ while true ; do
    else
       sudo sh -c "echo $SETNEWADMPWD > /.eayunos/newpas" &> /dev/null
       sudo engine-config -s AdminPassword --admin-pass-file=/.eayunos/newpas &> /dev/null
-      rm -rf /.eayunos/newpas
+      sudo rm -rf /.eayunos/newpas
       if [ $? -eq 0 ]; then
          sudo service ovirt-engine restart &> /dev/null
          if [ $? -eq 0 ]; then
-            rm -rf /.eayunos/engineadminpw
+            sudo rm -rf /.eayunos/engineadminpw
             echo -n "Password change successfully. Press any key to continue."
             read -n1
             break
