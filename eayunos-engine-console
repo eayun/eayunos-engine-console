@@ -197,7 +197,7 @@ SET_HOSTNAME(){
 ##
 
 printf "\033c" 
-if [ $HOSTNAME != "localhost" ] || [$HOSTNAME != "localhost.localdomain" ]; then
+if [ $HOSTNAME != "localhost" ] || [ $HOSTNAME != "localhost.localdomain" ]; then
    sudo sed -i "/$HOSTNAME/d" /etc/hosts
 fi
 if [ $IPADDR != "127.0.0.1" ]; then
@@ -210,7 +210,7 @@ if ! [ -z $SETHOSTNAME ]; then
 fi
 HOSTSENTRY="$IPADDR	$SETHOSTNAME"
 sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
-sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$HOSTNAM --otopi-environment="OSETUP_RENAME/forceIgnoreAIAInCA=bool:'True' OVESETUP_CORE/engineStop=bool:'True' OSETUP_RENAME/confirmForceOverwrite=bool:'False'" &> /dev/null
+sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$HOSTNAME --otopi-environment="OSETUP_RENAME/forceIgnoreAIAInCA=bool:'True' OVESETUP_CORE/engineStop=bool:'True' OSETUP_RENAME/confirmForceOverwrite=bool:'False'" &> /dev/null
 ADV_SET
 
 }
