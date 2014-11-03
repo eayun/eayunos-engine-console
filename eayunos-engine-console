@@ -87,6 +87,10 @@ CHKIPRET=false
 if [ -z $CHECKIP ] &> /dev/null; then
    CHKIPRET=true
 else
+   if [ $CHECKIP == "c" ]; then
+      break
+      ADV_SET
+   fi
    sudo ipcalc -c $CHECKIP &> /dev/null
    if [ $? -eq 0 ]; then
       CHKIPRET=true
@@ -102,12 +106,18 @@ NETWORK_CONF(){
 #IP/NETMASK/GATEWAY/DNS configuration
 ##
 
+GET_SYS_INFO
 printf "\033c"
 echo "Network Configuration"
 echo
-echo "Enter the new network configuration settings."
+echo "	IP Address:	$IPADDR
+	Netmask:	$NETMASK
+	Gateway:	$GATEWAY
+	DNS:		$DNS1
+"
+echo "Enter the new network configuration."
 echo
-read -p "Enter the IP Address: |$IPADDR| " SETIPADDR
+read -p "Enter the IP Address or c to cancle: |$IPADDR| " SETIPADDR
 #echo "SETIPADDR $SETIPADDR" > /tmp/aa.txt
 while true ; do
    CHECKIP=$SETIPADDR
@@ -116,7 +126,7 @@ while true ; do
    fi
    CHECK_IP
    if $CHKIPRET ; then
-      read -p "Enter the Netmask: |$NETMASK| " SETNETMASK
+      read -p "Enter the Netmask or c to cancle: |$NETMASK| " SETNETMASK
       while true ; do
          CHECKIP=$SETNETMASK
 	 if [ -z $SETNETMASK ] &> /dev/null; then
@@ -124,7 +134,7 @@ while true ; do
 	 fi
          CHECK_IP
          if $CHKIPRET ; then
-            read -p "Enter the Gateway: |$GATEWAY| " SETGATEWAY
+            read -p "Enter the Gateway or c to cancle: |$GATEWAY| " SETGATEWAY
             while true ; do
                CHECKIP=$SETGATEWAY
 	       if [ -z $SETGATEWAY ] &> /dev/null; then
@@ -132,7 +142,7 @@ while true ; do
 	       fi
                CHECK_IP
                if $CHKIPRET ; then
-                  read -p "Enter the DNS: |$DNS1| " SETDNS
+                  read -p "Enter the DNS or c to cancle: |$DNS1| " SETDNS
                   while true ; do
                      CHECKIP=$SETDNS
 	             if [ -z $SETDNS ] &> /dev/null; then
@@ -140,51 +150,75 @@ while true ; do
 	             fi
                      CHECK_IP
 		     if $CHKIPRET ; then 
-		        sudo sed -i "s/BOOTPROTO.*/BOOTPROTO=none/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
-		        if `sudo grep -q "^IPADDR" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
-		           sudo sed -i "s/IPADDR.*/IPADDR=$SETIPADDR/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
-		        else
-		           sudo sh -c "echo "IPADDR=$SETIPADDR" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
-	      	        fi
-			if [ $IPADDR != "127.0.0.1" ]; then
-			   sudo sed -i "/$IPADDR/d" /etc/hosts
-			   HOSTSENTRY="$SETIPADDR	$HOSTNAME"
-			   sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
-			fi
-		        if `sudo grep -q "^NETMASK" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
-		           sudo sed -i "s/NETMASK.*/NETMASK=$SETNETMASK/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
-		        else
-		           sudo sh -c "echo "NETMASK=$SETNETMASK" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
-		        fi
-		        if `sudo grep -q "^GATEWAY" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
-		           sudo sed -i "s/GATEWAY.*/GATEWAY=$SETGATEWAY/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
-		        else
-		           sudo sh -c "echo "GATEWAY=$SETGATEWAY" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
-		        fi
-		        if `sudo grep -q "^DNS1" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
-		           sudo sed -i "s/DNS1.*/DNS1=$SETDNS/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
-		        else
-		           sudo sh -c "echo "DNS1=$SETDNS" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
-		        fi
-	 		   sudo service network restart &> /dev/null
-                        break
+			printf "\033c"
+			echo "Network Configuration"
+			echo
+			echo "	IP Address:	$IPADDR	==>	$SETIPADDR
+	Netmask:	$NETMASK	==>	$SETNETMASK
+	Gateway:	$GATEWAY	==>	$SETGATEWAY
+	DNS:		$DNS1		==>	$SETDNS
+"
+			while true ; do
+			   read -p "Confirm the network configuration (Y/R/C): " SNCYN
+			   case $SNCYN in
+			   [yY])
+		              sudo sed -i "s/BOOTPROTO.*/BOOTPROTO=none/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
+		              if `sudo grep -q "^IPADDR" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
+		                 sudo sed -i "s/IPADDR.*/IPADDR=$SETIPADDR/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
+		              else
+		                 sudo sh -c "echo "IPADDR=$SETIPADDR" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
+	      	              fi
+			      if [ $IPADDR != "127.0.0.1" ]; then
+			         sudo sed -i "/$IPADDR/d" /etc/hosts
+			         HOSTSENTRY="$SETIPADDR	$HOSTNAME"
+			         sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
+			      fi
+		              if `sudo grep -q "^NETMASK" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
+		                 sudo sed -i "s/NETMASK.*/NETMASK=$SETNETMASK/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
+		              else
+		                 sudo sh -c "echo "NETMASK=$SETNETMASK" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
+		              fi
+		              if `sudo grep -q "^GATEWAY" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
+		                 sudo sed -i "s/GATEWAY.*/GATEWAY=$SETGATEWAY/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
+		              else
+		                 sudo sh -c "echo "GATEWAY=$SETGATEWAY" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
+		              fi
+		              if `sudo grep -q "^DNS1" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
+		                 sudo sed -i "s/DNS1.*/DNS1=$SETDNS/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
+		              else
+		                 sudo sh -c "echo "DNS1=$SETDNS" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
+		              fi
+	 		         sudo service network restart &> /dev/null
+                              break
+			   ;;
+			   [rR])
+			      NETWORK_CONF
+			   ;;
+			   [cC])
+			      ADV_SET
+			   ;;
+			   *)
+			      continue
+			   esac
+			done
+			break
                      else
-			read -p "Enter the NNS: |$DNS1| " SETDNS
+			read -p "Enter the DNS or c to cancle: |$DNS1| " SETDNS
                      fi
                   done
 		  break
 	       else
-	          read -p "Enter the Netmask: |$GATEWAY| " SETGATEWAY
+	          read -p "Enter the Netmask or c to cancle: |$GATEWAY| " SETGATEWAY
 	       fi
             done
             break
          else
-            read -p "Enter the Netmask: |$NETMASK| " SETNETMASK
+            read -p "Enter the Netmask or c to cancle: |$NETMASK| " SETNETMASK
          fi
       done
       break
    else
-      read -p "Enter the IP Address: |$IPADDR| " SETIPADDR
+      read -p "Enter the IP Address or c to cancle: |$IPADDR| " SETIPADDR
    fi
 done
 ADV_SET
@@ -196,21 +230,41 @@ SET_HOSTNAME(){
 #HOSTNAME configuration
 ##
 
+GET_SYS_INFO
 printf "\033c" 
-if [ $HOSTNAME != "localhost" ] || [ $HOSTNAME != "localhost.localdomain" ]; then
+if [ $HOSTNAME != "localhost" ] && [ $HOSTNAME != "localhost.localdomain" ]; then
    sudo sed -i "/$HOSTNAME/d" /etc/hosts
+   echo "hostname: $HOSTNAME" >> /tmp/console.log
 fi
 if [ $IPADDR != "127.0.0.1" ]; then
    sudo sed -i "/$IPADDR/d" /etc/hosts
 fi
 read -p "Please enter the hostname: " SETHOSTNAME
 if ! [ -z $SETHOSTNAME ]; then
-   sudo hostname $SETHOSTNAME
-   sudo sed -i "s/^HOSTNAME.*/HOSTNAME=$SETHOSTNAME/g" /etc/sysconfig/network
+   while true; do
+      read -p "Set the hostname to \"$SETHOSTNAME\" (Y/R/C)" SHNYN
+      case $SHNYN in
+      [yY])
+         sudo hostname $SETHOSTNAME
+         sudo sed -i "s/^HOSTNAME.*/HOSTNAME=$SETHOSTNAME/g" /etc/sysconfig/network
+         HOSTSENTRY="$IPADDR	$SETHOSTNAME"
+         sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
+         sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$SETHOSTNAME --otopi-environment="OSETUP_RENAME/forceIgnoreAIAInCA=bool:'True' OVESETUP_CORE/engineStop=bool:'True' OSETUP_RENAME/confirmForceOverwrite=bool:'False'" &> /dev/null
+         break
+      ;;
+      [cC])
+         ADV_SET
+      ;;
+      [rR])
+         SET_HOSTNAME
+      ;;
+      *)
+         continue
+      esac
+   done
+else
+   SET_HOSTNAME
 fi
-HOSTSENTRY="$IPADDR	$SETHOSTNAME"
-sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
-sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$SETHOSTNAME --otopi-environment="OSETUP_RENAME/forceIgnoreAIAInCA=bool:'True' OVESETUP_CORE/engineStop=bool:'True' OSETUP_RENAME/confirmForceOverwrite=bool:'False'" &> /dev/null
 ADV_SET
 
 }
