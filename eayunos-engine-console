@@ -242,7 +242,7 @@ fi
 read -p "Please enter the hostname: " SETHOSTNAME
 if ! [ -z $SETHOSTNAME ]; then
    while true; do
-      read -p "Set the hostname to \"$SETHOSTNAME\" (Y/R/C)" SHNYN
+      read -p "Set the hostname to \"$SETHOSTNAME\" (Y/R/C): " SHNYN
       case $SHNYN in
       [yY])
          sudo hostname $SETHOSTNAME
