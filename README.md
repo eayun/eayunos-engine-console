@@ -45,7 +45,7 @@
     
     Choose the advanced setting: 
 
-######（1）输入“1”，回车，配置系统的IP/Netmask/Gateway/DNS信息
+* 输入“1”，回车，配置系统的IP/Netmask/Gateway/DNS信息
 
     Network Configuration
     
@@ -56,7 +56,7 @@
     Enter the Gateway: |192.168.0.1| 
     Enter the DNS: |8.8.8.8| 
 
-######（2）输入“2”，回车，可进行网络连通性测试（直接回车返回上级配置页面）
+* 输入“2”，回车，可进行网络连通性测试（直接回车返回上级配置页面）
 
     Test Network Configuration
     
@@ -64,11 +64,11 @@
     192.168.0.1: Success!
     Enter the hostname, ip address, or none to continue:
 
-######（3）输入“3”，回车，可修改主机名
+* 输入“3”，回车，可修改主机名
 
     Please enter the hostname: aa.bb.cc
 
-######（4）输入“4”，回车，可设置系统时间
+* 输入“4”，回车，可设置系统时间
 
     Date and Time Configuration
     
@@ -82,18 +82,18 @@
     
     Apply Date and Time configuration? (Y/N): Y
 
-######（5）输入“5”，回车，可修改系统“/etc/hosts”文件
+* 输入“5”，回车，可修改系统“/etc/hosts”文件
 
     127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
     ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
     
     192.168.2.195 aa.bb.cc
 
-######（6）输入“6”，回车，可重启“ovirt-engine”服务
+* 输入“6”，回车，可重启“ovirt-engine”服务
 
     Engine Restart (Y/N): Y
 
-######（7）输入“7”，回车，可重新配置“ovirt-engine”服务。输入“1”，回车，可清除engine的配置；输入“2”，回车，可配置engine；输入“3”，回车，可重新配置Web Portal admin用户密码；输入“4”，回车，可返回上级配置页面。
+* 输入“7”，回车，可重新配置“ovirt-engine”服务。输入“1”，回车，可清除engine的配置；输入“2”，回车，可配置engine；输入“3”，回车，可重新配置Web Portal admin用户密码；输入“4”，回车，可返回上级配置页面。
 
     Engine Advanced Configuration
     
@@ -106,7 +106,7 @@
     
     Choose the advanced setting:
 
-######（8）输入“8”，回车，可重启或关闭系统
+* 输入“8”，回车，可重启或关闭系统
 
     Restart or Shutdown the System.
     
@@ -116,13 +116,13 @@
     
     Choose the advanced setting: 
 
-######（9）输入“9”，回车，可获得系统Shell
+* 输入“9”，回车，可获得系统Shell
 
-######（10）输入“10”，回车，可返回查看系统状态信息
+* 输入“10”，回车，可返回查看系统状态信息
 
-######（11）输入“11”，回车，可查看帮助信息
+* 输入“11”，回车，可查看帮助信息
 
-######（12）输入“12”，回车，退出登陆
+* 输入“12”，回车，退出登陆
 
 ---
 
