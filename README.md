@@ -6,6 +6,7 @@
 
 * 登陆到控制台后首先看到的是系统的状态信息：
 
+```
     Welcome to the EayunOS 4.1 Engine Appliance.
     
     To manage your appliance please browse to Web Portal.
@@ -24,9 +25,11 @@
     
     
     Press any key to continue.
+```
 
 * 按任意键可以进入配置页面
 
+```
     Advanced Setting
     
     1) Network Configuration
@@ -44,6 +47,7 @@
     
     
     Choose the advanced setting: 
+```
 
 * 输入“1”，回车，配置系统的IP/Netmask/Gateway/DNS信息
 
