@@ -8,11 +8,26 @@
 #Product infomation
 EAYUNOS_VERSION=4.1
 
+#Log file
+LOGFILE=/var/log/eayunos-engine-console.log
+
+LOGGER(){
+
+if [ $2 == "B" ]; then
+   echo "******$1***BEGIN******" | logger -p local3.debug
+fi
+if [ $2 == "E" ]; then
+   echo "******$1****END*******" | logger -p local3.debug
+fi
+
+}
+
 GET_SYS_INFO(){
 ##
 #Get system info
 ##
 
+LOGGER $FUNCNAME B
 HOSTNAME=`hostname`
 ACTNIC=`sudo ip link | grep "state UP" | awk '{print $2}' | cut -d ":" -f 1`
 IPADDR=`sudo ifconfig $ACTNIC | grep "inet addr" | awk '{print $2}' | cut -d ":" -f 2`
@@ -35,6 +50,7 @@ if ! [ -z $OVEVER ];then
 else
    OVEVER="Not Install"
 fi
+LOGGER $FUNCNAME E
 
 }
 
@@ -43,6 +59,7 @@ SUM_INFO(){
 #Print Summary Information
 ##
 
+LOGGER $FUNCNAME B
 printf "\033c"
 
 GET_SYS_INFO
@@ -74,6 +91,7 @@ fi
 echo
 echo -n "Press any key to continue."
 read -n1
+LOGGER $FUNCNAME E
 ADV_SET
 
 }
@@ -83,6 +101,7 @@ CHECK_IP(){
 #IP address validity check
 ##   
 
+LOGGER $FUNCNAME B
 CHKIPRET=false
 if [ -z $CHECKIP ] &> /dev/null; then
    CHKIPRET=true
@@ -91,13 +110,14 @@ else
       break
       ADV_SET
    fi
-   sudo ipcalc -c $CHECKIP &> /dev/null
+   sudo ipcalc -c $CHECKIP &>> $LOGFILE
    if [ $? -eq 0 ]; then
       CHKIPRET=true
    else
       CHKIPRET=false
    fi
 fi
+LOGGER $FUNCNAME E
 
 }
 
@@ -106,6 +126,7 @@ NETWORK_CONF(){
 #IP/NETMASK/GATEWAY/DNS configuration
 ##
 
+LOGGER $FUNCNAME B
 GET_SYS_INFO
 printf "\033c"
 echo "Network Configuration"
@@ -188,7 +209,7 @@ while true ; do
 		              else
 		                 sudo sh -c "echo "DNS1=$SETDNS" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
 		              fi
-	 		         sudo service network restart &> /dev/null
+	 		         sudo service network restart &>> $LOGFILE
                               break
 			   ;;
 			   [rR])
@@ -221,6 +242,7 @@ while true ; do
       read -p "Enter the IP Address or c to cancle: |$IPADDR| " SETIPADDR
    fi
 done
+LOGGER $FUNCNAME E
 ADV_SET
 
 }
@@ -230,11 +252,12 @@ SET_HOSTNAME(){
 #HOSTNAME configuration
 ##
 
+LOGGER $FUNCNAME B
 GET_SYS_INFO
 printf "\033c" 
 if [ $HOSTNAME != "localhost" ] && [ $HOSTNAME != "localhost.localdomain" ]; then
    sudo sed -i "/$HOSTNAME/d" /etc/hosts
-   echo "hostname: $HOSTNAME" >> /tmp/console.log
+#   echo "hostname: $HOSTNAME" >> /tmp/console.log
 fi
 if [ $IPADDR != "127.0.0.1" ]; then
    sudo sed -i "/$IPADDR/d" /etc/hosts
@@ -249,7 +272,7 @@ if ! [ -z $SETHOSTNAME ]; then
          sudo sed -i "s/^HOSTNAME.*/HOSTNAME=$SETHOSTNAME/g" /etc/sysconfig/network
          HOSTSENTRY="$IPADDR	$SETHOSTNAME"
          sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
-         sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$SETHOSTNAME --otopi-environment="OSETUP_RENAME/forceIgnoreAIAInCA=bool:'True' OVESETUP_CORE/engineStop=bool:'True' OSETUP_RENAME/confirmForceOverwrite=bool:'False'" &> /dev/null
+         sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$SETHOSTNAME --otopi-environment="OSETUP_RENAME/forceIgnoreAIAInCA=bool:'True' OVESETUP_CORE/engineStop=bool:'True' OSETUP_RENAME/confirmForceOverwrite=bool:'False'" &>> $LOGFILE
          break
       ;;
       [cC])
@@ -265,6 +288,7 @@ if ! [ -z $SETHOSTNAME ]; then
 else
    SET_HOSTNAME
 fi
+LOGGER $FUNCNAME E
 ADV_SET
 
 }
@@ -274,13 +298,15 @@ NETWORK_TEST(){
 #Network connectivity test
 ##
 
+LOGGER $FUNCNAME B
 printf "\033c"
 echo "Test Network Configuration"
 echo
 while true; do
 read -p "Enter the hostname, ip address, or none to continue: " TESTADDR
    if [ -z $TESTADDR ]; then
-      ADV_SET
+#      ADV_SET
+      break
    else
       sudo ping -c 1 $TESTADDR &> /dev/null
       if [ $? -eq 0 ]; then
@@ -290,6 +316,8 @@ read -p "Enter the hostname, ip address, or none to continue: " TESTADDR
       fi
    fi
 done
+LOGGER $FUNCNAME E
+ADV_SET
 
 }
 
@@ -298,6 +326,7 @@ SET_DATE_TIME(){
 #Date and Time configuration
 ##
 
+LOGGER $FUNCNAME B
 printf "\033c"
 echo "Date and Time Configuration"
 echo
@@ -306,14 +335,14 @@ if [ $SETDATE == "c" ]; then
    ADV_SET
 fi
 while true ; do
-   date -d $SETDATE "+%F" 2> /dev/null | grep -q "$SETDATE" &> /dev/null
+   date -d $SETDATE "+%F" 2> /dev/null | grep -q "$SETDATE" &>> $LOGFILE
    if [ $? -eq 0 ];then
       read -p "Enter the current time in 24 hour format (HH:MM:SS) or \"c\" to Cancel : " SETTIME
       if [ $SETTIME == "c" ]; then
          break
       fi
       while true ; do
-      date -d $SETTIME "+%T" 2> /dev/null | grep -q "$SETTIME" &> /dev/null
+      date -d $SETTIME "+%T" 2> /dev/null | grep -q "$SETTIME" &>> $LOGFILE
       if [ $? -eq 0 ];then
          printf "\033c"
          echo "Date and Time Configuration
@@ -324,8 +353,8 @@ while true ; do
 	 read -p "Apply Date and Time configuration? (Y/N): " YN
 	 while true ; do
             if [ $YN == "Y" ] &> /dev/null || [ $YN == "y" ] &> /dev/null; then
-	       sudo date -s $SETDATE &> /dev/null
-	       sudo date -s $SETTIME &> /dev/null
+	       sudo date -s $SETDATE &>> $LOGFILE
+	       sudo date -s $SETTIME &>> $LOGFILE
 	       break
             elif [ $YN == "N" ] &> /dev/null || [ $YN == "n" ] &> /dev/null; then
 	       ADV_SET
@@ -350,6 +379,7 @@ while true ; do
       fi
    fi
 done
+LOGGER $FUNCNAME E
 ADV_SET
 
 }
@@ -359,13 +389,15 @@ HOSTS_FILE(){
 #Modify the /etc/hosts file
 ##
 
+LOGGER $FUNCNAME B
 printf "\033c"
 sudo cp -f /etc/hosts /tmp/hosts
 #sudo chown admin /tmp/hosts
 sudo chown engineadm /tmp/hosts
 vi /tmp/hosts
 sudo cp -f /tmp/hosts /etc/hosts
-tm -rf /tmp/hosts
+rm -rf /tmp/hosts
+LOGGER $FUNCNAME E
 ADV_SET
 
 }
@@ -433,6 +465,7 @@ ENGINE_RESTART(){
 #Restart ovirt-engine service
 ##
 
+LOGGER $FUNCNAME B
 printf "\033c"
 echo
 read -p "Engine Restart (Y/N): " ENGREST
@@ -441,7 +474,7 @@ while true; do
       read -p "Engine Restart (Y/N): " ENGREST
    elif [ $ENGREST == Y ] || [ $ENGREST == y ];then
 #      echo "Engine Restart"
-      sudo service ovirt-engine restart &> /dev/null
+      sudo service ovirt-engine restart &>> $LOGFILE
       if [ $? -eq 0 ]; then
          echo -n "Engine restart successfully. Press any key to continue."
 	 read -n1
@@ -457,12 +490,14 @@ while true; do
       read -p "Engine Restart (Y/N): " ENGREST
    fi
 done
+LOGGER $FUNCNAME E
 ADV_SET
 
 }
 
 RESET_ADMINPW(){
 
+LOGGER $FUNCNAME B
 printf "\033c"
 read -sp "New password :" SETNEWADMPWD
 if [ -z $SETNEWADMPWD ]; then
@@ -486,11 +521,11 @@ while true ; do
       read -n1
       RESET_ADMINPW
    else
-      sudo sh -c "echo $SETNEWADMPWD > /.eayunos/newpas" &> /dev/null
-      sudo engine-config -s AdminPassword --admin-pass-file=/.eayunos/newpas &> /dev/null
+      sudo sh -c "echo $SETNEWADMPWD > /.eayunos/newpas" &>> $LOGFILE
+      sudo engine-config -s AdminPassword --admin-pass-file=/.eayunos/newpas &>> $LOGFILE
       sudo rm -rf /.eayunos/newpas
       if [ $? -eq 0 ]; then
-         sudo service ovirt-engine restart &> /dev/null
+         sudo service ovirt-engine restart &>> $LOGFILE
          if [ $? -eq 0 ]; then
             sudo rm -rf /.eayunos/engineadminpw
             echo -n "Password change successfully. Press any key to continue."
@@ -508,6 +543,7 @@ while true ; do
       fi
    fi
 done
+LOGGER $FUNCNAME E
 ADV_SET
 
 }
@@ -517,39 +553,65 @@ ENGINE_ADVANCE_CONF(){
 #Cleanup the Engine configuration and reconfiguration
 ##
 
+LOGGER $FUNCNAME B
 printf "\033c"
 echo "Engine Advanced Configuration"
 echo
 echo "
-1) Engine Cleanup !
-2) Engine Setup !
-3) Reset Web Portal admin password !
+1) Engine Cleanup 
+2) Engine Setup 
+3) Reset Web Portal admin password 
 4) Back
 "
 echo 
 read -p "Choose the advanced setting: " ENGADVCONF
 case $ENGADVCONF in
 1)
-   sudo engine-cleanup &> /dev/null
-   if [ $? -eq 0 ]; then
-      echo "Engine Cleanup Success !"
-   else
-      echo "Engine Cleanup Failed !"
-   fi
-   echo -n "Press any key to continue."
-   read -n1
-   ENGINE_ADVANCE_CONF
+while true; do
+   read -p "Engine Cleanup (Y/N) :" ECYN
+   case $ECYN in
+   [yY])
+      sudo engine-cleanup &>> $LOGFILE
+      if [ $? -eq 0 ]; then
+         echo "Engine Cleanup Success !"
+      else
+         echo "Engine Cleanup Failed !"
+      fi
+      echo -n "Press any key to continue."
+      read -n1
+      break
+      ENGINE_ADVANCE_CONF
+   ;;
+   [nN])
+      ENGINE_ADVANCE_CONF
+   ;;
+   *)
+      continue
+   esac
+done
 ;;
 2)
-   sudo engine-setup &> /dev/null
-   if [ $? -eq 0 ]; then
-      echo "Engine Setup Success !"
-   else
-      echo "Engine Setup Failed !"
-   fi
-   echo -n "Press any key to continue."
-   read -n1
-   ENGINE_ADVANCE_CONF
+while true; do
+   read -p "Engine Setup (Y/N): " ESYN
+   case $ESYN in
+   [yY])
+      sudo engine-setup &>> $LOGFILE
+      if [ $? -eq 0 ]; then
+         echo "Engine Setup Success !"
+      else
+         echo "Engine Setup Failed !"
+      fi
+      echo -n "Press any key to continue."
+      read -n1
+      ENGINE_ADVANCE_CONF
+   ;;
+   [nN])
+      ENGINE_ADVANCE_CONF
+   ;;
+   *)
+      continue
+   esac
+done
 ;;
 3)
    RESET_ADMINPW 
@@ -560,6 +622,7 @@ case $ENGADVCONF in
 *)
    ENGINE_ADVANCE_CONF 
 esac
+LOGGER $FUNCNAME E
 
 }
 
@@ -568,6 +631,7 @@ APPLIANCE_RESTART(){
 #Appliance restart
 ##
 
+LOGGER $FUNCNAME B
 printf "\033c"
 echo
 read -p "Restart the System (Y/N): " APPLREST
@@ -585,6 +649,7 @@ while true; do
       read -p "Restart the System (Y/N): " APPLREST
    fi
 done
+LOGGER $FUNCNAME E
 
 }
 
@@ -593,6 +658,7 @@ APPLIANCE_SHUTDOWN(){
 #Appliance shutdown
 ##
 
+LOGGER $FUNCNAME B
 printf "\033c"
 echo
 read -p "Shutdown the System (Y/N): " APPLSHUTDOWN
@@ -609,6 +675,7 @@ while true; do
       read -p "Shutdown the System (Y/N): " APPLSHUTDOWN
    fi
 done
+LOGGER $FUNCNAME E
 
 }
 
@@ -617,6 +684,7 @@ APPLIANCE_RESTART_SHUTDOWN(){
 #Appliance Restart or Shutdown
 ##
 
+LOGGER $FUNCNAME B
 printf "\033c"
 echo
 echo "Restart or Shutdown the System."
@@ -639,6 +707,7 @@ case $RESTARTORSHUTDOWN in
 *)
    APPLIANCE_RESTART_SHUTDOWN
 esac
+LOGGER $FUNCNAME E
 
 }
 
@@ -647,8 +716,23 @@ SU_ROOT(){
 #Get a shell. Switch to root.
 ##
 
+LOGGER $FUNCNAME B
 printf "\033c"
 sudo su root
+LOGGER $FUNCNAME E
+ADV_SET
+
+}
+
+HELP(){
+##
+#For help
+##
+
+LOGGER $FUNCNAME B
+printf "\033c"
+sudo less /usr/share/doc/eayunos-engine-console/README.md
+LOGGER $FUNCNAME E
 ADV_SET
 
 }
@@ -658,6 +742,7 @@ ADV_SET(){
 #Advanced Configuration Page
 ##
 
+LOGGER $FUNCNAME B
 printf "\033c"
 echo "
 
@@ -673,7 +758,8 @@ Advanced Setting
 8) System Restart or Shutdown
 9) Shell
 10) Summary Information
-11) Log OFF
+11) Help
+12) Log OFF
 
 "
 read -p "Choose the advanced setting: " SELNUM
@@ -709,12 +795,26 @@ case $SELNUM in
    SUM_INFO
 ;;
 11)
+   HELP
+;;
+12)
+   echo "#########LOGOUT#########" | logger -p local3.debug 
    exit
 ;;
 *)
    ADV_SET
 esac
+LOGGER $FUNCNAME E
+
 }
 
+MAIN(){
+##
 #main
+##
+[ -w $LOGFILE ] || sudo chown engineadm $LOGFILE
+echo "#########LOGIN##########" | logger -p local3.debug
 SUM_INFO
+}
+
+MAIN
