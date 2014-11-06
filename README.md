@@ -1,10 +1,10 @@
-###一个EayunOS Engine的管理工具，用户可以通过该工具方便、快捷的管理Engine系统。
+####一个EayunOS Engine的管理工具，用户可以通过该工具方便、快捷的管理Engine系统。
 =============
 #####使用方法：
 
-#####Note：第一次登陆后需要对系统进行初始化配置，配置流程：1-->2-->3-->7(3)-->6，配置完成后浏览器访问"http://{Web Portal IP}/ovirt-engine/services/health"，返回"DB Up!Welcome to Health Status!"说明
+* Note：第一次登陆后需要对系统进行初始化配置，配置流程：1-->2-->3-->7(3)-->6，配置完成后浏览器访问"http://{Web Portal IP}/ovirt-engine/services/health"，返回"DB Up!Welcome to Health Status!"说明
 
-######登陆到控制台后首先看到的是系统的状态信息：
+* 登陆到控制台后首先看到的是系统的状态信息：
 
     Welcome to the EayunOS 4.1 Engine Appliance.
     
@@ -25,7 +25,7 @@
     
     Press any key to continue.
 
-######按任意键可以进入配置页面
+* 按任意键可以进入配置页面
 
     Advanced Setting
     
