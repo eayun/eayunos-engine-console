@@ -60,23 +60,23 @@
 
 * 输入“2”，回车，可进行网络连通性测试（直接回车返回上级配置页面）
 
-
+```
     Test Network Configuration
     
     Enter the hostname, ip address, or none to continue: 192.168.0.1
     192.168.0.1: Success!
     Enter the hostname, ip address, or none to continue:
-
+```
 
 * 输入“3”，回车，可修改主机名
 
-
+```
     Please enter the hostname: aa.bb.cc
-
+```
 
 * 输入“4”，回车，可设置系统时间
 
-
+```
     Date and Time Configuration
     
     Enter the current date (YYYY-MM-DD) or "c" to Cancel : 2014-10-17
@@ -88,26 +88,26 @@
     	Time :		13:40:00
     
     Apply Date and Time configuration? (Y/N): Y
-
+```
 
 * 输入“5”，回车，可修改系统“/etc/hosts”文件
 
-
+```
     127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
     ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
     
     192.168.2.195 aa.bb.cc
-
+```
 
 * 输入“6”，回车，可重启“ovirt-engine”服务
 
-
+```
     Engine Restart (Y/N): Y
-
+```
 
 * 输入“7”，回车，可重新配置“ovirt-engine”服务。输入“1”，回车，可清除engine的配置；输入“2”，回车，可配置engine；输入“3”，回车，可重新配置Web Portal admin用户密码；输入“4”，回车，可返回上级配置页面。
 
-
+```
     Engine Advanced Configuration
     
     
@@ -118,11 +118,11 @@
     
     
     Choose the advanced setting:
-
+```
 
 * 输入“8”，回车，可重启或关闭系统
 
-
+```
     Restart or Shutdown the System.
     
     1) Restart the System 
@@ -130,7 +130,7 @@
     3) Back
     
     Choose the advanced setting: 
-
+```
 
 * 输入“9”，回车，可获得系统Shell
 
@@ -140,5 +140,4 @@
 
 * 输入“12”，回车，退出登陆
 
----
 
