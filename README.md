@@ -54,12 +54,18 @@
 ```
     Network Configuration
     
-    Enter the new network configuration settings.
+    	IP Address:	192.168.3.250
+    	Netmask:	255.255.252.0
+    	Gateway:	192.168.0.1
+    	DNS:		8.8.8.8
     
-    Enter the IP Address: |192.168.2.195| 
-    Enter the Netmask: |255.255.252.0| 
-    Enter the Gateway: |192.168.0.1| 
-    Enter the DNS: |8.8.8.8| 
+    Enter the new network configuration.
+    
+    Enter the IP Address or c to cancle: |192.168.3.250| 
+    Enter the Netmask or c to cancle: |255.255.252.0| 
+    Enter the Gateway or c to cancle: |192.168.0.1| 
+    Enter the DNS or c to cancle: |8.8.8.8| 
+
 ```
 
 * 输入“2”，回车，可进行网络连通性测试（直接回车返回上级配置页面）
