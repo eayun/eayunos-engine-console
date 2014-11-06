@@ -47,7 +47,7 @@
 
 * 输入“1”，回车，配置系统的IP/Netmask/Gateway/DNS信息
 
-
+```
     Network Configuration
     
     Enter the new network configuration settings.
@@ -56,7 +56,7 @@
     Enter the Netmask: |255.255.252.0| 
     Enter the Gateway: |192.168.0.1| 
     Enter the DNS: |8.8.8.8| 
-
+```
 
 * 输入“2”，回车，可进行网络连通性测试（直接回车返回上级配置页面）
 
