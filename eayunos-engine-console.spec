@@ -31,11 +31,16 @@ cp eayunos-engine-console %{buildroot}/usr/libexec/
 cp README.md %{buildroot}/usr/share/doc/eayunos-engine-console/
 
 %post
-useradd engineadm
-passwd -d engineadm
-passwd -e engineadm
+useradd engineadm &> /dev/null
+passwd -d engineadm &> /dev/null
+passwd -e engineadm &> /dev/null
 sed -i "/engineadm/ s/\/bin\/bash/\/usr\/libexec\/eayunos-engine-console/g" /etc/passwd
 echo 'engineadm   ALL=(ALL)       NOPASSWD:ALL' >> /etc/sudoers
+cat >> /etc/rsyslog.conf <<EOF
+# Save eayunos-engine-console messages
+local3.*                                                /var/log/eayunos-engine-console.log
+EOF
+service rsyslog restart &> /dev/null
 
 %clean
 rm -rf %{buildroot}
