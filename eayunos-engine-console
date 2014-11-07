@@ -189,10 +189,12 @@ while true ; do
 		              else
 		                 sudo sh -c "echo "IPADDR=$SETIPADDR" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
 	      	              fi
-			      if [ $IPADDR != "127.0.0.1" ]; then
-			         sudo sed -i "/$IPADDR/d" /etc/hosts
-			         HOSTSENTRY="$SETIPADDR	$HOSTNAME"
-			         sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
+			      if ! [ -z $IPADDR ]; then
+			         if [ $IPADDR != "127.0.0.1" ]; then
+			            sudo sed -i "/$IPADDR/d" /etc/hosts
+			            HOSTSENTRY="$SETIPADDR	$HOSTNAME"
+			            sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
+			         fi
 			      fi
 		              if `sudo grep -q "^NETMASK" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
 		                 sudo sed -i "s/NETMASK.*/NETMASK=$SETNETMASK/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
@@ -259,8 +261,10 @@ if [ $HOSTNAME != "localhost" ] && [ $HOSTNAME != "localhost.localdomain" ]; the
    sudo sed -i "/$HOSTNAME/d" /etc/hosts
 #   echo "hostname: $HOSTNAME" >> /tmp/console.log
 fi
-if [ $IPADDR != "127.0.0.1" ]; then
-   sudo sed -i "/$IPADDR/d" /etc/hosts
+if ! [ -z $IPADDR ]; then
+   if [ $IPADDR != "127.0.0.1" ]; then
+      sudo sed -i "/$IPADDR/d" /etc/hosts
+   fi
 fi
 read -p "Please enter the hostname: " SETHOSTNAME
 if ! [ -z $SETHOSTNAME ]; then
@@ -758,8 +762,7 @@ Advanced Setting
 8) System Restart or Shutdown
 9) Shell
 10) Summary Information
-11) Help
-12) Log OFF
+11) Log OFF
 
 "
 read -p "Choose the advanced setting: " SELNUM
@@ -794,10 +797,10 @@ case $SELNUM in
 10)
    SUM_INFO
 ;;
+#11)
+#   HELP
+#;;
 11)
-   HELP
-;;
-12)
    echo "#########LOGOUT#########" | logger -p local3.debug 
    exit
 ;;
