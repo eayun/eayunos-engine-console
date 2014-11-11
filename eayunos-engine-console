@@ -1,5 +1,4 @@
 #!/bin/bash
-
 ##
 # EayunOS Engine Management Tools. 
 # By:zhe.ma@eayun.com
@@ -552,6 +551,137 @@ ADV_SET
 
 }
 
+WGT_DOMAIN_INIT(){
+##
+#WGT_DOMAIN ISO domain initialization
+##
+LOGGER $FUNCNAME B
+GET_SYS_INFO
+printf "\033c"
+
+ENGINEHEALTH=`curl http://$IPADDR/ovirt-engine/services/health 2> /dev/null`
+if ! [ "x$ENGINEHEALTH" == 'xDB Up!Welcome to Health Status!' ]; then
+   echo -n "Engine is not running ! Please verify the engine status ."
+   read -n1
+else
+   read -p "Please enter the password for admin@internal: " ADMPWD
+   #verify password
+   sudo curl -k -u admin@internal:$ADMPWD https://$IPADDR/api/ 2> /dev/null | grep 'product_info' &> /dev/null
+   if [ $? -eq 0 ]; then
+      #generate ovirtshelrc file
+      cat > ~/.ovirtshellrc <<EOF
+[cli]
+autoconnect = True
+autopage = True
+[ovirt-shell]
+username = admin@internal
+timeout = None
+extended_prompt = False
+url = https://$IPADDR/api
+insecure = True
+renew_session = False
+filter = False
+session_timeout = None
+ca_file = None
+dont_validate_cert_chain = False
+key_file = None
+password = $ADMPWD
+cert_file = None
+EOF
+#      break
+   else
+      #password is wrong , retry
+      while true ; do
+         read -p "Password is wrong. ([R]eset/[E]xit): " PWRE
+         case $PWRE in
+         [rR])
+            WGT_DOMAIN_INIT
+            break
+         ;;
+         [eE])
+            break
+         ;;
+         *)
+            continue
+         esac
+      done
+   fi
+fi
+
+#HOSTSNUM=`ovirt-shell -E "list hosts" | grep id | wc -l`
+#verify there have an activing host
+echo "-----------------------------------------------------"
+echo -n "[1/5]Activing Host. Verifing ... "
+ovirt-shell -E 'list hosts --show-all' | grep 'status-state' | grep -q 'up'
+if [ $? -ne 0 ]; then
+   echo -e "\033[31;1m[Failed]\033[0m"
+   echo "-----------------------------------------------------"
+   echo "There doesn't exsit activing host."
+   echo -n "Press any key to continue. "
+   read -n1
+else
+   echo -e "\033[32;1m [OK]\033[0m"
+   #verify WGT_DOMAIN exsit
+   echo -n "[2/5]WGT_DOMAIN exsit. Verifing ... "
+   ovirt-shell -E "list storagedomains" | grep -q "WGT_DOMAIN"
+   if [ $? -ne 0 ]; then
+      echo -e "\033[31;1m[Failed]\033[0m"
+      echo "-----------------------------------------------------"
+      echo "WGT_DOMAIN dose not exsit."
+      echo -n "Press any key to continue. "
+      read -n1
+   else
+      echo -e "\033[32;1m [OK]\033[0m"
+      #verify WGT_DOMAIN unattached
+      echo -n "[3/5]WGT_DOMAIN unattached. Verifing ... "
+      ovirt-shell -E 'list storagedomains --query "name=WGT_DOMAIN" --show-all' | grep 'status-state' | grep -q 'unattached'
+      if [ $? -ne 0 ]; then
+         echo -e "\033[31;1m[Failed]\033[0m"
+         echo "-----------------------------------------------------"
+         echo "Please dettach \"WGT_DOMAIN\" from any DataCenter."
+         echo -n "Press any key to continue. "
+         read -n1
+      else
+         echo -e "\033[32;1m [OK]\033[0m"
+         #remove old domain
+         echo -n "[4/5]Remove old domain. Removing ... "
+         HOSTID=`ovirt-shell -E "list hosts" | grep id  | head -1 | awk '{print $3}'`
+         ovirt-shell -E "remove storagedomain WGT_DOMAIN --host-id $HOSTID" | grep 'status-state' | grep -q 'complete'
+         if [ $? -ne 0 ]; then
+            echo -e "\033[31;1m[Failed]\033[0m"
+            echo "-----------------------------------------------------"
+            echo "WGT_DOMAIN remove failed."
+            echo -n "Press any key to continue. "
+            read -n 1
+         else
+            echo -e "\033[32;1m [OK]\033[0m"
+            #import WGT_DOMAIN
+            echo -n "[5/5]Import WGT_DOMAIN. Importing ... "
+            ovirt-shell -E "add storagedomain --host-id $HOSTID --type iso --storage-type nfs --storage-address $IPADDR --storage-path /var/lib/exports/iso" | grep 'name' | grep -q 'WGT_DOMAIN'
+            if [ $? -ne 0 ]; then
+               echo -e "\033[31;1m[Failed]\033[0m"
+               echo "-----------------------------------------------------"
+               echo "WGT_DOMAIN initialization failed."
+               echo -n "Press any key to continue. "
+               read -n1
+            else
+               echo -e "\033[32;1m [OK]\033[0m"
+               echo "-----------------------------------------------------"
+               echo "WGT_DOMAIN initialization successfully."
+               echo -n "Press any key to continue. "
+               read -n1
+            fi
+            rm -rf ~/.ovirtshellrc
+         fi
+      fi
+   fi
+fi
+
+ENGINE_ADVANCE_CONF
+
+LOGGER $FUNCNAME E
+}
+
 ENGINE_ADVANCE_CONF(){
 ##
 #Cleanup the Engine configuration and reconfiguration
@@ -565,7 +695,8 @@ echo "
 1) Engine Cleanup 
 2) Engine Setup 
 3) Reset Web Portal admin password 
-4) Back
+4) WGT_DOMAIN initialization
+5) Back
 "
 echo 
 read -p "Choose the advanced setting: " ENGADVCONF
@@ -575,7 +706,7 @@ while true; do
    read -p "Engine Cleanup (Y/N) :" ECYN
    case $ECYN in
    [yY])
-      sudo engine-cleanup &>> $LOGFILE
+      sudo engine-cleanup
       if [ $? -eq 0 ]; then
          echo "Engine Cleanup Success !"
       else
@@ -599,7 +730,7 @@ while true; do
    read -p "Engine Setup (Y/N): " ESYN
    case $ESYN in
    [yY])
-      sudo engine-setup &>> $LOGFILE
+      sudo engine-setup
       if [ $? -eq 0 ]; then
          echo "Engine Setup Success !"
       else
@@ -621,6 +752,9 @@ done
    RESET_ADMINPW 
 ;;
 4)
+   WGT_DOMAIN_INIT
+;;
+5)
    ADV_SET
 ;;
 *)
@@ -745,6 +879,7 @@ ADV_SET(){
 ##
 #Advanced Configuration Page
 ##
+trap $FUNCNAME SIGINT
 
 LOGGER $FUNCNAME B
 printf "\033c"
