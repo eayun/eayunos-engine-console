@@ -57,6 +57,8 @@ SUM_INFO(){
 ##
 #Print Summary Information
 ##
+#trap "$FUNCNAME" SIGINT
+trap '' SIGINT
 
 LOGGER $FUNCNAME B
 printf "\033c"
@@ -551,27 +553,25 @@ ADV_SET
 
 }
 
-GET_PASSWD(){
+GET_PWD(){
 ##
 #GET PASSWD
 ##
 
-password=""
-echo -n "Please enter the password for admin@internal: "
-while : ;do
-    char=`
-        stty cbreak -echo
-        dd if=/dev/tty bs=1 count=1 2>/dev/null
-        stty -cbreak echo
-    `
-    if [ "$char" =  "" ];then
-        break
-    fi
-    password="$password$char"
-    echo -n "*"
-done
-echo
-ADMPWD=$password
+#while : ;do
+#    char=`
+#        stty cbreak -echo
+#        dd if=/dev/tty bs=1 count=1 2>/dev/null
+#        stty -cbreak echo
+#    `
+#    if [ "$char" =  "" ];then
+#        break
+#    fi
+#    password="$password$char"
+#    echo -n "*"
+#done
+#echo
+read -s -n 1 ;[[ -z $REPLY ]] && return || echo -n "*";ADMPWD=$ADMPWD$REPLY;GET_PWD
 
 }
 
@@ -583,6 +583,7 @@ LOGGER $FUNCNAME B
 GET_SYS_INFO
 printf "\033c"
 IFINIT=false
+ADMPWD=""
 
 #verify engine health
 ENGINEHEALTH=`curl http://$IPADDR/ovirt-engine/services/health 2> /dev/null`
@@ -590,7 +591,9 @@ if ! [ "x$ENGINEHEALTH" == 'xDB Up!Welcome to Health Status!' ]; then
    echo -n "Engine is not running ! Please verify the engine status ."
    read -n1
 else
-   GET_PASSWD
+   echo -n "Please enter the password for admin@internal: "
+   GET_PWD
+   echo
    #verify password
    sudo curl -k -u admin@internal:$ADMPWD https://$IPADDR/api/ 2> /dev/null | grep 'product_info' &> /dev/null
    if [ $? -eq 0 ]; then
@@ -907,7 +910,6 @@ ADV_SET(){
 ##
 #Advanced Configuration Page
 ##
-trap $FUNCNAME SIGINT
 
 LOGGER $FUNCNAME B
 printf "\033c"
