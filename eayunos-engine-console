@@ -551,6 +551,30 @@ ADV_SET
 
 }
 
+GET_PASSWD(){
+##
+#GET PASSWD
+##
+
+password=""
+echo -n "Please enter the password for admin@internal: "
+while : ;do
+    char=`
+        stty cbreak -echo
+        dd if=/dev/tty bs=1 count=1 2>/dev/null
+        stty -cbreak echo
+    `
+    if [ "$char" =  "" ];then
+        break
+    fi
+    password="$password$char"
+    echo -n "*"
+done
+echo
+ADMPWD=$password
+
+}
+
 WGT_DOMAIN_INIT(){
 ##
 #WGT_DOMAIN ISO domain initialization
@@ -558,16 +582,19 @@ WGT_DOMAIN_INIT(){
 LOGGER $FUNCNAME B
 GET_SYS_INFO
 printf "\033c"
+IFINIT=false
 
+#verify engine health
 ENGINEHEALTH=`curl http://$IPADDR/ovirt-engine/services/health 2> /dev/null`
 if ! [ "x$ENGINEHEALTH" == 'xDB Up!Welcome to Health Status!' ]; then
    echo -n "Engine is not running ! Please verify the engine status ."
    read -n1
 else
-   read -p "Please enter the password for admin@internal: " ADMPWD
+   GET_PASSWD
    #verify password
    sudo curl -k -u admin@internal:$ADMPWD https://$IPADDR/api/ 2> /dev/null | grep 'product_info' &> /dev/null
    if [ $? -eq 0 ]; then
+      IFINIT=true
       #generate ovirtshelrc file
       cat > ~/.ovirtshellrc <<EOF
 [cli]
@@ -588,7 +615,6 @@ key_file = None
 password = $ADMPWD
 cert_file = None
 EOF
-#      break
    else
       #password is wrong , retry
       while true ; do
@@ -596,7 +622,7 @@ EOF
          case $PWRE in
          [rR])
             WGT_DOMAIN_INIT
-            break
+#            break
          ;;
          [eE])
             break
@@ -608,70 +634,72 @@ EOF
    fi
 fi
 
-#HOSTSNUM=`ovirt-shell -E "list hosts" | grep id | wc -l`
-#verify there have an activing host
-echo "-----------------------------------------------------"
-echo -n "[1/5]Activing Host. Verifing ... "
-ovirt-shell -E 'list hosts --show-all' | grep 'status-state' | grep -q 'up'
-if [ $? -ne 0 ]; then
-   echo -e "\033[31;1m[Failed]\033[0m"
+if $IFINIT ; then
+   #HOSTSNUM=`ovirt-shell -E "list hosts" | grep id | wc -l`
+   #verify there have an activing host
    echo "-----------------------------------------------------"
-   echo "There doesn't exsit activing host."
-   echo -n "Press any key to continue. "
-   read -n1
-else
-   echo -e "\033[32;1m [OK]\033[0m"
-   #verify WGT_DOMAIN exsit
-   echo -n "[2/5]WGT_DOMAIN exsit. Verifing ... "
-   ovirt-shell -E "list storagedomains" | grep -q "WGT_DOMAIN"
+   echo -n "[1/5]Activing Host. Verifing ... "
+   ovirt-shell -E 'list hosts --show-all' | grep 'status-state' | grep -q 'up'
    if [ $? -ne 0 ]; then
       echo -e "\033[31;1m[Failed]\033[0m"
       echo "-----------------------------------------------------"
-      echo "WGT_DOMAIN dose not exsit."
+      echo "There doesn't exsit activing host."
       echo -n "Press any key to continue. "
       read -n1
    else
       echo -e "\033[32;1m [OK]\033[0m"
-      #verify WGT_DOMAIN unattached
-      echo -n "[3/5]WGT_DOMAIN unattached. Verifing ... "
-      ovirt-shell -E 'list storagedomains --query "name=WGT_DOMAIN" --show-all' | grep 'status-state' | grep -q 'unattached'
+      #verify WGT_DOMAIN exsit
+      echo -n "[2/5]WGT_DOMAIN exsit. Verifing ... "
+      ovirt-shell -E "list storagedomains" | grep -q "WGT_DOMAIN"
       if [ $? -ne 0 ]; then
          echo -e "\033[31;1m[Failed]\033[0m"
          echo "-----------------------------------------------------"
-         echo "Please dettach \"WGT_DOMAIN\" from any DataCenter."
+         echo "WGT_DOMAIN dose not exsit."
          echo -n "Press any key to continue. "
          read -n1
       else
          echo -e "\033[32;1m [OK]\033[0m"
-         #remove old domain
-         echo -n "[4/5]Remove old domain. Removing ... "
-         HOSTID=`ovirt-shell -E "list hosts" | grep id  | head -1 | awk '{print $3}'`
-         ovirt-shell -E "remove storagedomain WGT_DOMAIN --host-id $HOSTID" | grep 'status-state' | grep -q 'complete'
+         #verify WGT_DOMAIN unattached
+         echo -n "[3/5]WGT_DOMAIN unattached. Verifing ... "
+         ovirt-shell -E 'list storagedomains --query "name=WGT_DOMAIN" --show-all' | grep 'status-state' | grep -q 'unattached'
          if [ $? -ne 0 ]; then
             echo -e "\033[31;1m[Failed]\033[0m"
             echo "-----------------------------------------------------"
-            echo "WGT_DOMAIN remove failed."
+            echo "Please dettach \"WGT_DOMAIN\" from any DataCenter."
             echo -n "Press any key to continue. "
-            read -n 1
+            read -n1
          else
             echo -e "\033[32;1m [OK]\033[0m"
-            #import WGT_DOMAIN
-            echo -n "[5/5]Import WGT_DOMAIN. Importing ... "
-            ovirt-shell -E "add storagedomain --host-id $HOSTID --type iso --storage-type nfs --storage-address $IPADDR --storage-path /var/lib/exports/iso" | grep 'name' | grep -q 'WGT_DOMAIN'
+            #remove old domain
+            echo -n "[4/5]Remove old domain. Removing ... "
+            HOSTID=`ovirt-shell -E "list hosts" | grep id  | head -1 | awk '{print $3}'`
+            ovirt-shell -E "remove storagedomain WGT_DOMAIN --host-id $HOSTID" | grep 'status-state' | grep -q 'complete'
             if [ $? -ne 0 ]; then
                echo -e "\033[31;1m[Failed]\033[0m"
                echo "-----------------------------------------------------"
-               echo "WGT_DOMAIN initialization failed."
+               echo "WGT_DOMAIN remove failed."
                echo -n "Press any key to continue. "
-               read -n1
+               read -n 1
             else
                echo -e "\033[32;1m [OK]\033[0m"
-               echo "-----------------------------------------------------"
-               echo "WGT_DOMAIN initialization successfully."
-               echo -n "Press any key to continue. "
-               read -n1
+               #import WGT_DOMAIN
+               echo -n "[5/5]Import WGT_DOMAIN. Importing ... "
+               ovirt-shell -E "add storagedomain --host-id $HOSTID --type iso --storage-type nfs --storage-address $IPADDR --storage-path /var/lib/exports/iso" | grep 'name' | grep -q 'WGT_DOMAIN'
+               if [ $? -ne 0 ]; then
+                  echo -e "\033[31;1m[Failed]\033[0m"
+                  echo "-----------------------------------------------------"
+                  echo "WGT_DOMAIN initialization failed."
+                  echo -n "Press any key to continue. "
+                  read -n1
+               else
+                  echo -e "\033[32;1m [OK]\033[0m"
+                  echo "-----------------------------------------------------"
+                  echo "WGT_DOMAIN initialization successfully."
+                  echo -n "Press any key to continue. "
+                  read -n1
+               fi
+               rm -rf ~/.ovirtshellrc
             fi
-            rm -rf ~/.ovirtshellrc
          fi
       fi
    fi

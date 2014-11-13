@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
 Version:	0.4
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Management Tool
 
 Group:		Application
