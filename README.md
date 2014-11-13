@@ -115,8 +115,12 @@
     Engine Restart (Y/N): Y
 ```
 
-* 输入“7”，回车，可重新配置“ovirt-engine”服务。输入“1”，回车，可清除engine的配置；输入“2”，回车，可配置engine；输入“3”，回车，可重新配置Web Portal admin用户密码；输入“4”，回车，可返回上级配置页面。
-
+* 输入“7”，回车，可重新配置“ovirt-engine”服务。
+ * 输入“1”，回车，可清除engine的配置；
+ * 输入“2”，回车，可配置engine；
+ * 输入“3”，回车，可重新配置Web Portal admin用户密码；
+ * 输入“4”，回车，可初始化WGT_DOMAIN域（ISO）
+ * 输入“5”，回车，可返回上级配置页面。
 ```
     Engine Advanced Configuration
     
@@ -124,7 +128,8 @@
     1) Engine Cleanup 
     2) Engine Setup 
     3) Reset Web Portal admin password 
-    4) Back
+    4) WGT_DOMAIN initialization
+    5) Back
     
     
     Choose the advanced setting:
