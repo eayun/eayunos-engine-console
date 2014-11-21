@@ -181,7 +181,7 @@ while true ; do
 	DNS:		$DNS1		==>	$SETDNS
 "
 			while true ; do
-			   read -p "Confirm the network configuration (Y/R/C): " SNCYN
+			   read -p "Confirm the network configuration ([Y]es/[R]eset/[C]ancle): " SNCYN
 			   case $SNCYN in
 			   [yY])
 		              sudo sed -i "s/BOOTPROTO.*/BOOTPROTO=none/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
@@ -270,7 +270,7 @@ fi
 read -p "Please enter the hostname: " SETHOSTNAME
 if ! [ -z $SETHOSTNAME ]; then
    while true; do
-      read -p "Set the hostname to \"$SETHOSTNAME\" (Y/R/C): " SHNYN
+      read -p "Set the hostname to \"$SETHOSTNAME\" ([Y]es/[R]eset/[C]ancle): " SHNYN
       case $SHNYN in
       [yY])
          sudo hostname $SETHOSTNAME
@@ -358,7 +358,7 @@ while true ; do
 	Date :		$SETDATE
 	Time :		$SETTIME"
 	 echo
-	 read -p "Apply Date and Time configuration? (Y/N): " YN
+	 read -p "Apply Date and Time configuration? ([Y]es/[N]o): " YN
 	 while true ; do
             if [ $YN == "Y" ] &> /dev/null || [ $YN == "y" ] &> /dev/null; then
 	       sudo date -s $SETDATE &>> $LOGFILE
@@ -368,7 +368,7 @@ while true ; do
 	       ADV_SET
             else
 	       echo 'Please enter "Y" or "N".'
-	       read -p "Apply Date and Time configuration? (Y/N): " YN
+	       read -p "Apply Date and Time configuration? ([Y]es/[N]o): " YN
             fi
 	 done
          break
@@ -476,10 +476,10 @@ ENGINE_RESTART(){
 LOGGER $FUNCNAME B
 printf "\033c"
 echo
-read -p "Engine Restart (Y/N): " ENGREST
+read -p "Engine Restart ([Y]es/[N]o): " ENGREST
 while true; do
    if [ -z $ENGREST ]; then
-      read -p "Engine Restart (Y/N): " ENGREST
+      read -p "Engine Restart ([Y]es/[N]o): " ENGREST
    elif [ $ENGREST == Y ] || [ $ENGREST == y ];then
 #      echo "Engine Restart"
       sudo service ovirt-engine restart &>> $LOGFILE
@@ -495,7 +495,7 @@ while true; do
       ADV_SET
       break
    else
-      read -p "Engine Restart (Y/N): " ENGREST
+      read -p "Engine Restart ([Y]es/[N]o): " ENGREST
    fi
 done
 LOGGER $FUNCNAME E
@@ -737,7 +737,7 @@ read -p "Choose the advanced setting: " ENGADVCONF
 case $ENGADVCONF in
 1)
 while true; do
-   read -p "Engine Cleanup (Y/N) :" ECYN
+   read -p "Engine Cleanup ([Y]es/[N]o) :" ECYN
    case $ECYN in
    [yY])
       sudo engine-cleanup
@@ -761,7 +761,7 @@ done
 ;;
 2)
 while true; do
-   read -p "Engine Setup (Y/N): " ESYN
+   read -p "Engine Setup ([Y]es/[N]o): " ESYN
    case $ESYN in
    [yY])
       sudo engine-setup
@@ -806,10 +806,10 @@ APPLIANCE_RESTART(){
 LOGGER $FUNCNAME B
 printf "\033c"
 echo
-read -p "Restart the System (Y/N): " APPLREST
+read -p "Restart the System ([Y]es/[N]o): " APPLREST
 while true; do
    if [ -z $APPLREST ]; then
-      read -p "Restart the System (Y/N): " APPLREST
+      read -p "Restart the System ([Y]es/[N]o): " APPLREST
    elif [ $APPLREST == Y ] || [ $APPLREST == y ];then
 #      echo "Restart System"
          sudo init 6
@@ -818,7 +818,7 @@ while true; do
       ADV_SET
       break
    else
-      read -p "Restart the System (Y/N): " APPLREST
+      read -p "Restart the System ([Y]es/[N]o): " APPLREST
    fi
 done
 LOGGER $FUNCNAME E
@@ -833,10 +833,10 @@ APPLIANCE_SHUTDOWN(){
 LOGGER $FUNCNAME B
 printf "\033c"
 echo
-read -p "Shutdown the System (Y/N): " APPLSHUTDOWN
+read -p "Shutdown the System ([Y]es/[N]o): " APPLSHUTDOWN
 while true; do
    if [ -z $APPLSHUTDOWN ]; then
-      read -p "Shutdown the System (Y/N): " APPLSHUTDOWN
+      read -p "Shutdown the System ([Y]es/[N]o): " APPLSHUTDOWN
    elif [ $APPLSHUTDOWN == Y ] || [ $APPLSHUTDOWN == y ];then
       sudo init 0
       break
@@ -844,7 +844,7 @@ while true; do
       ADV_SET
       break
    else
-      read -p "Shutdown the System (Y/N): " APPLSHUTDOWN
+      read -p "Shutdown the System ([Y]es/[N]o): " APPLSHUTDOWN
    fi
 done
 LOGGER $FUNCNAME E
