@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
 Version:	0.4
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -55,6 +55,8 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Nov 21 2014 MaZhe <zhe.ma@eayun.com> 0.4-6
+- fix interactive infomation (issues #2)
 
 * Fri Oct 17 2014 MaZhe <zhe.ma@eayun.com> 0.1-1
 - Initial package tagging.
