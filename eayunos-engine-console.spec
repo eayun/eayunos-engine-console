@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
-Version:	0.4
-Release:	6%{?dist}
+Version:	0.5
+Release:	1%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -55,6 +55,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Nov 26 2014 MaZhe <zhe.ma@eayun.com> 0.5-1
+- Add oVirt Engine Reports Portal user password configuration function
+
 * Fri Nov 21 2014 MaZhe <zhe.ma@eayun.com> 0.4-6
 - fix interactive infomation (issues #2)
 

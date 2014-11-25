@@ -716,6 +716,55 @@ ENGINE_ADVANCE_CONF
 LOGGER $FUNCNAME E
 }
 
+RESET_REPORTS_ADMINPW(){
+##
+#Reset reports portal 'admin' user password
+##
+
+LOGGER $FUNCNAME B
+printf "\033c"
+read -sp "New password :" SetNewReportsAdmPwd
+if [ -z $SetNewReportsAdmPwd ]; then
+   echo
+   echo -n "Password cannot be empty. Press any key to continue."
+   read -n1
+   RESET_REPORTS_ADMINPW
+fi
+echo
+read -sp "Retype new password :" SetRetNewReportsAdmPwd
+if [ -z $SetRetNewReportsAdmPwd ]; then
+   echo
+   echo -n "Sorry, passwords do not match. Press any key to try again."
+   read -n1
+   RESET_REPORTS_ADMINPW
+fi
+echo
+while true ; do
+   if [ "x$SetNewReportsAdmPwd" != "x$SetRetNewReportsAdmPwd" ]; then
+      echo -n "Sorry, passwords do not match. Press any key to try again."
+      read -n1
+      RESET_REPORTS_ADMINPW
+   else
+      #Modify the password
+      echo "It will take a while. Please wait. "
+      sudo engine-reports-config-passwd --user=admin --password=$SetNewReportsAdmPwd --non-interactive &>> $LOGFILE
+      if [ $? -eq 0 ]; then
+         echo -n "Password change successfully. Press any key to continue."
+         read -n1
+         break
+      else
+         echo -n "Password change failed. Press any key to continue."
+         read -n1
+         break
+      fi
+   fi
+done
+
+LOGGER $FUNCNAME E
+ADV_SET
+
+}
+
 ENGINE_ADVANCE_CONF(){
 ##
 #Cleanup the Engine configuration and reconfiguration
@@ -728,9 +777,10 @@ echo
 echo "
 1) Engine Cleanup 
 2) Engine Setup 
-3) Reset Web Portal admin password 
+3) Reset Web Portal 'admin' user password 
 4) WGT_DOMAIN initialization
-5) Back
+5) Reset Reports Portal 'admin' user password
+6) Back
 "
 echo 
 read -p "Choose the advanced setting: " ENGADVCONF
@@ -789,6 +839,9 @@ done
    WGT_DOMAIN_INIT
 ;;
 5)
+   RESET_REPORTS_ADMINPW
+;;
+6)
    ADV_SET
 ;;
 *)
