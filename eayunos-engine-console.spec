@@ -11,6 +11,7 @@ BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
 BuildRequires:	/bin/bash
 Requires:	ovirt-engine
+Requires:	engine-reports-config-passwd
 
 %description
 EayunOS Engine Management Tool.
