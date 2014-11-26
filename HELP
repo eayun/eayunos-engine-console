@@ -117,7 +117,8 @@
  * Press "2", [enter], configuration the Engine
  * Press "3", [enter], modify the password of the Web Portal admin user
  * Press "4", [enter], initiazation the WGT_DOMAIN domain(ISO)
- * Press "5", [enter], go back
+ * Press "5", [enter], modify the password of the Reports Portal admin user
+ * Press "6", [enter], go back
 ```
 
     Engine Advanced Configuration
@@ -125,9 +126,10 @@
     
     1) Engine Cleanup 
     2) Engine Setup 
-    3) Reset Web Portal admin password 
+    3) Reset Web Portal 'admin' password 
     4) WGT_DOMAIN initialization
-    5) Back
+    5) Reset Reports Portal 'admin' user password
+    6) Back
     
     
     Choose the advanced setting:
