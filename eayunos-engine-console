@@ -184,6 +184,7 @@ while true ; do
 			   read -p "Confirm the network configuration ([Y]es/[R]eset/[C]ancle): " SNCYN
 			   case $SNCYN in
 			   [yY])
+                              echo "It will take a while. Please wait. "
 		              sudo sed -i "s/BOOTPROTO.*/BOOTPROTO=none/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
 		              if `sudo grep -q "^IPADDR" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
 		                 sudo sed -i "s/IPADDR.*/IPADDR=$SETIPADDR/g" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC
@@ -193,8 +194,8 @@ while true ; do
 			      if ! [ -z $IPADDR ]; then
 			         if [ $IPADDR != "127.0.0.1" ]; then
 			            sudo sed -i "/$IPADDR/d" /etc/hosts
-			            HOSTSENTRY="$SETIPADDR	$HOSTNAME"
-			            sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
+#			            HOSTSENTRY="$SETIPADDR	$HOSTNAME"
+#			            sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
 			         fi
 			      fi
 		              if `sudo grep -q "^NETMASK" /etc/sysconfig/network-scripts/ifcfg-$ACTNIC`; then
@@ -212,7 +213,23 @@ while true ; do
 		              else
 		                 sudo sh -c "echo "DNS1=$SETDNS" >> /etc/sysconfig/network-scripts/ifcfg-$ACTNIC"
 		              fi
-	 		         sudo service network restart &>> $LOGFILE
+#	 		         sudo service network restart &>> $LOGFILE
+	 		         sudo service network restart
+                                 if [ $? -eq 0 ]; then
+			            if ! [ -z $SETIPADDR ]; then
+			               if [ $SETIPADDR != "127.0.0.1" ]; then
+			                  HOSTSENTRY="$SETIPADDR	$HOSTNAME"
+			                  sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
+			               fi
+			            fi
+                                    echo
+                                    echo -ne "Network Configuration \033[32;1mSuccessfully\033[0m. Press any key to continue. " | tee -a $LOGFILE
+                                    read -n1
+                                 else
+                                    echo
+                                    echo -ne "Network Configuration \033[31;1mFailed\033[0m. Press any key to continue. " | tee -a $LOGFILE
+                                    read -n1
+                                 fi      
                               break
 			   ;;
 			   [rR])
