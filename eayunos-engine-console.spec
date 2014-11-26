@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
 Version:	0.5
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -56,6 +56,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Nov 26 2014 MaZhe <zhe.ma@eayun.com> 0.5-3
+- Resolve hostname configuration issue [issue #5]
+
 * Fri Nov 26 2014 MaZhe <zhe.ma@eayun.com> 0.5-2
 - Fix network configuration bug [issue #6]
 

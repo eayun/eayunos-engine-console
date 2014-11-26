@@ -290,6 +290,7 @@ if ! [ -z $SETHOSTNAME ]; then
       read -p "Set the hostname to \"$SETHOSTNAME\" ([Y]es/[R]eset/[C]ancle): " SHNYN
       case $SHNYN in
       [yY])
+         echo -n "It will take a while. Please wait. " 
          sudo hostname $SETHOSTNAME
          sudo sed -i "s/^HOSTNAME.*/HOSTNAME=$SETHOSTNAME/g" /etc/sysconfig/network
          HOSTSENTRY="$IPADDR	$SETHOSTNAME"
@@ -298,6 +299,15 @@ if ! [ -z $SETHOSTNAME ]; then
          # this is workaround for rename .
          sudo sed -i "s/^OVESETUP_CONFIG\/fqdn=*./OVESETUP_CONFIG\/fqdn=str:$SETHOSTNAME/g" /etc/ovirt-engine-setup.conf.d/20-setup-ovirt-post.conf
          sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$SETHOSTNAME --otopi-environment="OSETUP_RENAME/forceIgnoreAIAInCA=bool:'True' OVESETUP_CORE/engineStop=bool:'True' OSETUP_RENAME/confirmForceOverwrite=bool:'False'" &>> $LOGFILE
+         if [ $? -eq 0 ]; then
+            echo
+            echo -ne "Hostname Configuration \033[32;1mSuccessfully\033[0m. Press any key to continue. " | tee -a $LOGFILE
+            read -n1
+         else
+            echo
+            echo -ne "Hostname Configuration \033[31;1mFailed\033[0m. Press any key to continue. " | tee -a $LOGFILE
+            read -n1
+         fi      
          break
       ;;
       [cC])
