@@ -370,7 +370,7 @@ printf "\033c"
 echo "Date and Time Configuration"
 echo
 read -p "Enter the current date (YYYY-MM-DD) or \"c\" to Cancel : " SETDATE
-if [ $SETDATE == "c" ]; then
+if [ "x$SETDATE" == "xc" ]; then
    ADV_SET
 fi
 while true ; do
@@ -413,7 +413,7 @@ while true ; do
       break
    else
       read -p "Enter the current date (YYYY-MM-DD) or \"c\" to Cancel : " SETDATE
-      if [ $SETDATE == "c" ]; then
+      if [ "x$SETDATE" == "xc" ]; then
          break
       fi
    fi
