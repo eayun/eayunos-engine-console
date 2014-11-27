@@ -292,7 +292,11 @@ if ! [ -z $SETHOSTNAME ]; then
       [yY])
          echo -n "It will take a while. Please wait. " 
          sudo hostname $SETHOSTNAME
-         sudo sed -i "s/^HOSTNAME.*/HOSTNAME=$SETHOSTNAME/g" /etc/sysconfig/network
+         if sudo grep -q "HOSTNAME" /etc/sysconfig/network ; then
+            sudo sed -i "s/^HOSTNAME.*/HOSTNAME=$SETHOSTNAME/g" /etc/sysconfig/network
+         else
+            sudo sed -i "1i HOSTNAME=$SETHOSTNAME" /etc/sysconfig/network
+         fi
          HOSTSENTRY="$IPADDR	$SETHOSTNAME"
          sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
          # ovirt-engine-rename will be check isodomain on engine host , if isodomain exsit , rename will be failed .

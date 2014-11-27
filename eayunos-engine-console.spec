@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
 Version:	0.5
-Release:	3%{?dist}
+Release:	4%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -56,6 +56,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Nov 27 2014 MaZhe <zhe.ma@eayun.com> 0.5-4
+- Resolve hostname revert to "localhost" issue [issue #3]
+
 * Fri Nov 26 2014 MaZhe <zhe.ma@eayun.com> 0.5-3
 - Resolve hostname configuration issue [issue #5]
 
