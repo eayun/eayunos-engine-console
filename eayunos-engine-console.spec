@@ -52,6 +52,7 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %attr(0755,root,root)/usr/libexec/eayunos-engine-console
 %doc /usr/share/doc/eayunos-engine-console/README.md
+%doc /usr/share/doc/eayunos-engine-console/HELP
 
 
 
