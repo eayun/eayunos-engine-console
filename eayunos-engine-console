@@ -84,10 +84,18 @@ To manage your appliance please browse to Web Portal.
 "
 if [ -e /.eayunos/engineadminpw ]; then
    INITPW=`head -1 /.eayunos/engineadminpw`
-   echo -n -e "\033[33m[NOTICE]:\033[0m "
-   echo "The initial password of Web Portal admin is $INITPW "
-   echo -n -e "\033[31m[WARNING]:\033[0m "
+   echo -n -e "\033[33m[ NOTICE  ]:\033[0m "
+   echo "The initial password of Web Portal admin is \"$INITPW\". "
+   echo -n -e "\033[31m[ WARNING ]:\033[0m "
    echo "Please change the Web Portal admin's password."
+fi
+echo
+if [ -e /.eayunos/reportsadminpw ]; then
+   INITREPPW=`head -1 /.eayunos/reportsadminpw`
+   echo -n -e "\033[33m[ NOTICE  ]:\033[0m "
+   echo "The initial password of Reports Portal admin is \"$INITREPPW\". "
+   echo -n -e "\033[31m[ WARNING ]:\033[0m "
+   echo "Please change the Reports Portal admin's password."
 fi
 echo
 echo -n "Press any key to continue."

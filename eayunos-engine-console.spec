@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
 Version:	0.5
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -56,6 +56,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Nov 28 2014 MaZhe <zhe.ma@eayun.com> 0.5-6
+- Added a function to display the password of the admin user of the reports portal [issue #12]
+
 * Fri Nov 27 2014 MaZhe <zhe.ma@eayun.com> 0.5-5
 - Fix string compare bug [issue #8]
 
