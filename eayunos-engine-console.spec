@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
-Version:	0.5
-Release:	6%{?dist}
+Version:	0.6
+Release:	1%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -30,6 +30,7 @@ mkdir -p %{buildroot}/usr/libexec/
 mkdir -p %{buildroot}/usr/share/doc/eayunos-engine-console/
 cp eayunos-engine-console %{buildroot}/usr/libexec/
 cp README.md %{buildroot}/usr/share/doc/eayunos-engine-console/
+cp HELP %{buildroot}/usr/share/doc/eayunos-engine-console/
 
 %post
 useradd engineadm &> /dev/null
@@ -56,6 +57,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Nov 28 2014 MaZhe <zhe.ma@eayun.com> 0.6-1
+- Added a function to display HELP information
+
 * Fri Nov 28 2014 MaZhe <zhe.ma@eayun.com> 0.5-6
 - Added a function to display the password of the admin user of the reports portal [issue #12]
 

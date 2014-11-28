@@ -995,7 +995,7 @@ HELP(){
 
 LOGGER $FUNCNAME B
 printf "\033c"
-sudo less /usr/share/doc/eayunos-engine-console/README.md
+sudo less /usr/share/doc/eayunos-engine-console/HELP
 LOGGER $FUNCNAME E
 ADV_SET
 
@@ -1022,7 +1022,8 @@ Advanced Setting
 8) System Restart or Shutdown
 9) Shell
 10) Summary Information
-11) Log OFF
+11) HELP
+12) Log OFF
 
 "
 read -p "Choose the advanced setting: " SELNUM
@@ -1057,10 +1058,10 @@ case $SELNUM in
 10)
    SUM_INFO
 ;;
-#11)
-#   HELP
-#;;
 11)
+   HELP
+;;
+12)
    echo "#########LOGOUT#########" | logger -p local3.debug 
    exit
 ;;
