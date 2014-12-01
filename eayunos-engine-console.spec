@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
 Version:	0.6
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -58,6 +58,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Dec  1 2014 MaZhe <zhe.ma@eayun.com> 0.6-3
+- Modify rename parameter "confirmForceOverwrite" to True
+- Resolve issue [issue #13]
+
 * Mon Dec  1 2014 MaZhe <zhe.ma@eayun.com> 0.6-2
 - Modify ENGINE_REPORTS_BASE_URL by rename function
 

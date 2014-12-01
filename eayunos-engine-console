@@ -311,7 +311,7 @@ if ! [ -z $SETHOSTNAME ]; then
          # this is workaround for rename .
          sudo sed -i "s/^OVESETUP_CONFIG\/fqdn=*./OVESETUP_CONFIG\/fqdn=str:$SETHOSTNAME/g" /etc/ovirt-engine-setup.conf.d/20-setup-ovirt-post.conf
          sudo sed -i "s/^ENGINE_REPORTS_BASE_URL=.*/ENGINE_REPORTS_BASE_URL=https:\/\/$SETHOSTNAME\/ovirt-engine-reports/g" /etc/ovirt-engine/engine.conf.d/10-setup-reports-access.conf
-         sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$SETHOSTNAME --otopi-environment="OSETUP_RENAME/forceIgnoreAIAInCA=bool:'True' OVESETUP_CORE/engineStop=bool:'True' OSETUP_RENAME/confirmForceOverwrite=bool:'False'" &>> $LOGFILE
+         sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$SETHOSTNAME --otopi-environment="OSETUP_RENAME/forceIgnoreAIAInCA=bool:'True' OVESETUP_CORE/engineStop=bool:'True' OSETUP_RENAME/confirmForceOverwrite=bool:'True'" &>> $LOGFILE
          if [ $? -eq 0 ]; then
             echo
             echo -ne "Hostname Configuration \033[32;1mSuccessfully\033[0m. Press any key to continue. " | tee -a $LOGFILE
