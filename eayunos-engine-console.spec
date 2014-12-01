@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
 Version:	0.6
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -58,6 +58,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Dec  1 2014 MaZhe <zhe.ma@eayun.com> 0.6-2
+- Modify ENGINE_REPORTS_BASE_URL by rename function
+
 * Fri Nov 28 2014 MaZhe <zhe.ma@eayun.com> 0.6-1
 - Added a function to display HELP information
 
