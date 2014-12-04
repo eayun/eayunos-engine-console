@@ -789,6 +789,7 @@ while true ; do
       echo "It will take a while. Please wait. "
       sudo engine-reports-config-passwd --user=admin --password=$SetNewReportsAdmPwd --non-interactive &>> $LOGFILE
       if [ $? -eq 0 ]; then
+         sudo rm -rf /.eayunos/reportsadminpw
          echo -n "Password change successfully. Press any key to continue."
          read -n1
          break
