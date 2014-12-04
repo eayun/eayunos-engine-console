@@ -147,7 +147,7 @@ echo "	IP Address:	$IPADDR
 "
 echo "Enter the new network configuration."
 echo
-read -p "Enter the IP Address or c to cancle: |$IPADDR| " SETIPADDR
+read -p "Enter the IP Address or c to cancel: |$IPADDR| " SETIPADDR
 #echo "SETIPADDR $SETIPADDR" > /tmp/aa.txt
 while true ; do
    CHECKIP=$SETIPADDR
@@ -156,7 +156,7 @@ while true ; do
    fi
    CHECK_IP
    if $CHKIPRET ; then
-      read -p "Enter the Netmask or c to cancle: |$NETMASK| " SETNETMASK
+      read -p "Enter the Netmask or c to cancel: |$NETMASK| " SETNETMASK
       while true ; do
          CHECKIP=$SETNETMASK
 	 if [ -z $SETNETMASK ] &> /dev/null; then
@@ -164,7 +164,7 @@ while true ; do
 	 fi
          CHECK_IP
          if $CHKIPRET ; then
-            read -p "Enter the Gateway or c to cancle: |$GATEWAY| " SETGATEWAY
+            read -p "Enter the Gateway or c to cancel: |$GATEWAY| " SETGATEWAY
             while true ; do
                CHECKIP=$SETGATEWAY
 	       if [ -z $SETGATEWAY ] &> /dev/null; then
@@ -172,7 +172,7 @@ while true ; do
 	       fi
                CHECK_IP
                if $CHKIPRET ; then
-                  read -p "Enter the DNS or c to cancle: |$DNS1| " SETDNS
+                  read -p "Enter the DNS or c to cancel: |$DNS1| " SETDNS
                   while true ; do
                      CHECKIP=$SETDNS
 	             if [ -z $SETDNS ] &> /dev/null; then
@@ -252,22 +252,22 @@ while true ; do
 			done
 			break
                      else
-			read -p "Enter the DNS or c to cancle: |$DNS1| " SETDNS
+			read -p "Enter the DNS or c to cancel: |$DNS1| " SETDNS
                      fi
                   done
 		  break
 	       else
-	          read -p "Enter the Netmask or c to cancle: |$GATEWAY| " SETGATEWAY
+	          read -p "Enter the Netmask or c to cancel: |$GATEWAY| " SETGATEWAY
 	       fi
             done
             break
          else
-            read -p "Enter the Netmask or c to cancle: |$NETMASK| " SETNETMASK
+            read -p "Enter the Netmask or c to cancel: |$NETMASK| " SETNETMASK
          fi
       done
       break
    else
-      read -p "Enter the IP Address or c to cancle: |$IPADDR| " SETIPADDR
+      read -p "Enter the IP Address or c to cancel: |$IPADDR| " SETIPADDR
    fi
 done
 LOGGER $FUNCNAME E
