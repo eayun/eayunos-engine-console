@@ -573,6 +573,8 @@ while true ; do
       sudo engine-config -s AdminPassword --admin-pass-file=/.eayunos/newpas &>> $LOGFILE
       if [ $? -eq 0 ]; then
          sudo rm -rf /.eayunos/newpas
+         #update optimizer configuration
+         [ -f /etc/ovirt-optimizer/ovirt-optimizer.properties ] && sudo sed -i "s/org.ovirt.optimizer.sdk.password=.*/org.ovirt.optimizer.sdk.password=$SETNEWADMPWD/g" /etc/ovirt-optimizer/ovirt-optimizer.properties
          sudo service ovirt-engine restart &>> $LOGFILE
          if [ $? -eq 0 ]; then
             sudo rm -rf /.eayunos/engineadminpw
