@@ -571,8 +571,8 @@ while true ; do
    else
       sudo sh -c "echo $SETNEWADMPWD > /.eayunos/newpas" &>> $LOGFILE
       sudo engine-config -s AdminPassword --admin-pass-file=/.eayunos/newpas &>> $LOGFILE
-      sudo rm -rf /.eayunos/newpas
       if [ $? -eq 0 ]; then
+         sudo rm -rf /.eayunos/newpas
          sudo service ovirt-engine restart &>> $LOGFILE
          if [ $? -eq 0 ]; then
             sudo rm -rf /.eayunos/engineadminpw
