@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
 Version:	0.6
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -58,6 +58,12 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Dec  9 2014 MaZhe <zhe.ma@eayun.com> 0.6-6
+- Resolve the garbled problem [issue #17]
+  Code optimization
+  Add update ovirt-optimizer.properties file function [issue #18]
+  
+
 * Thu Dec  4 2014 MaZhe <zhe.ma@eayun.com> 0.6-5
 - Resolve issue [issue #16]
 
