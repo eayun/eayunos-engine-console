@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
-Version:	0.7
-Release:	2%{?dist}
+Version:	0.8
+Release:	1%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -28,9 +28,11 @@ rm -rf %{buildroot}
 rm -rf .git
 mkdir -p %{buildroot}/usr/libexec/
 mkdir -p %{buildroot}/usr/share/doc/eayunos-engine-console/
+mkdir -p %{buildroot}/usr/share/eayunos-engine-console/bin/
 cp eayunos-engine-console %{buildroot}/usr/libexec/
 cp README.md %{buildroot}/usr/share/doc/eayunos-engine-console/
 cp HELP %{buildroot}/usr/share/doc/eayunos-engine-console/
+cp bin/ovirt-reset-db-password %{buildroot}/usr/share/eayunos-engine-console/bin/
 
 %post
 useradd engineadm &> /dev/null
@@ -43,6 +45,7 @@ cat >> /etc/rsyslog.conf <<EOF
 local3.*                                                /var/log/eayunos-engine-console.log
 EOF
 service rsyslog restart &> /dev/null
+ln -s /usr/share/eayunos-engine-console/bin/ovirt-reset-db-password /usr/bin/ovirt-reset-db-password
 
 %clean
 rm -rf %{buildroot}
@@ -51,6 +54,7 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)
 %attr(0755,root,root)/usr/libexec/eayunos-engine-console
+%attr(0755,root,root)/usr/share/eayunos-engine-console/bin/ovirt-reset-db-password
 %doc /usr/share/doc/eayunos-engine-console/README.md
 %doc /usr/share/doc/eayunos-engine-console/HELP
 
@@ -58,6 +62,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Dec 10 2014 MaZhe <zhe.ma@eayun.com> 0.8-1
+- Add reset database user's password function
+
 * Wed Dec 10 2014 MaZhe <zhe.ma@eayun.com> 0.7-2
 - Code optimization
 

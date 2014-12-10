@@ -818,6 +818,19 @@ ADV_SET
 
 }
 
+RESET_DB_PWD(){
+##
+#Reset Database users (engine/ovirt_engine_history/ovirt_engine_reports) password
+##
+LOGGER $FUNCNAME B
+sudo /usr/bin/ovirt-reset-db-password
+reset
+LOGGER $FUNCNAME E
+ADV_SET
+
+}
+
+
 ENGINE_ADVANCE_CONF(){
 ##
 #Cleanup the Engine configuration and reconfiguration
@@ -833,7 +846,8 @@ echo "
 3) Reset Web Portal 'admin' user password 
 4) WGT_DOMAIN initialization
 5) Reset Reports Portal 'admin' user password
-6) Back
+6) Reset Database password
+7) Back
 "
 echo 
 read -p "Choose the advanced setting: " ENGADVCONF
@@ -895,6 +909,9 @@ done
    RESET_REPORTS_ADMINPW
 ;;
 6)
+   RESET_DB_PWD
+;;
+7)
    ADV_SET
 ;;
 *)
