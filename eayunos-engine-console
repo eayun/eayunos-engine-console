@@ -229,6 +229,10 @@ while true ; do
 			                  HOSTSENTRY="$SETIPADDR	$HOSTNAME"
 			                  sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
 			               fi
+                                       #update engine-manage-domains configuration
+                                       sudo sed -i "s/{\"allowedMessageOrigins\": \"https:.*\"}/{\"allowedMessageOrigins\": \"https:\/\/$SETIPADDR\"}/g" /usr/share/ovirt-engine/ui-plugins/emdplugin.json 
+                                       #update ovirt-optimizer configuration
+                                       sudo sed -i "s/org.ovirt.optimizer.sdk.server=.*/org.ovirt.optimizer.sdk.server=$SETIPADDR/g" /etc/ovirt-optimizer/ovirt-optimizer.properties
 			            fi
                                     echo
                                     echo -ne "Network Configuration \033[32;1mSuccessfully\033[0m. Press any key to continue. " | tee -a $LOGFILE
@@ -313,6 +317,8 @@ if ! [ -z $SETHOSTNAME ]; then
          sudo sed -i "s/^ENGINE_REPORTS_BASE_URL=.*/ENGINE_REPORTS_BASE_URL=https:\/\/$SETHOSTNAME\/ovirt-engine-reports/g" /etc/ovirt-engine/engine.conf.d/10-setup-reports-access.conf
          sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$SETHOSTNAME --otopi-environment="OSETUP_RENAME/forceIgnoreAIAInCA=bool:'True' OVESETUP_CORE/engineStop=bool:'True' OSETUP_RENAME/confirmForceOverwrite=bool:'True'" &>> $LOGFILE
          if [ $? -eq 0 ]; then
+            #update ovirt-optimizer configuration
+            sudo sed -i "s/\"baseurl\":.*\//\"baseurl\": \"https:\/\/$SETHOSTNAME\/ovirt-optimizer\/result\//g" /etc/ovirt-engine/ui-plugins/ovirt-optimizer-config.json
             echo
             echo -ne "Hostname Configuration \033[32;1mSuccessfully\033[0m. Press any key to continue. " | tee -a $LOGFILE
             read -n1
@@ -575,6 +581,10 @@ while true ; do
          sudo rm -rf /.eayunos/newpas
          #update optimizer configuration
          [ -f /etc/ovirt-optimizer/ovirt-optimizer.properties ] && sudo sed -i "s/org.ovirt.optimizer.sdk.password=.*/org.ovirt.optimizer.sdk.password=$SETNEWADMPWD/g" /etc/ovirt-optimizer/ovirt-optimizer.properties
+         #update vm-backup configuration
+         [ -f /etc/engine-vm-backup/engine-vm-backup.properties ] && sudo sed -i "s/^engineSdkPassword=.*/engineSdkPassword=$SETNEWADMPWD/g" /etc/engine-vm-backup/engine-vm-backup.properties
+         sudo service engine-vm-backup restart &>> $LOGFILE
+         sudo service ovirt-optimizer restart &> $LOGFILE
          sudo service ovirt-engine restart &>> $LOGFILE
          if [ $? -eq 0 ]; then
             sudo rm -rf /.eayunos/engineadminpw
