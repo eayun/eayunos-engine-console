@@ -230,9 +230,9 @@ while true ; do
 			                  sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
 			               fi
                                        #update engine-manage-domains configuration
-                                       sudo sed -i "s/{\"allowedMessageOrigins\": \"https:.*\"}/{\"allowedMessageOrigins\": \"https:\/\/$SETIPADDR\"}/g" /usr/share/ovirt-engine/ui-plugins/emdplugin.json 
+                                       [ -f /usr/share/ovirt-engine/ui-plugins/emdplugin.json ] && sudo sed -i "s/{\"allowedMessageOrigins\": \"https:.*\"}/{\"allowedMessageOrigins\": \"https:\/\/$SETIPADDR\"}/g" /usr/share/ovirt-engine/ui-plugins/emdplugin.json 
                                        #update ovirt-optimizer configuration
-                                       sudo sed -i "s/org.ovirt.optimizer.sdk.server=.*/org.ovirt.optimizer.sdk.server=$SETIPADDR/g" /etc/ovirt-optimizer/ovirt-optimizer.properties
+                                       [ -f /etc/ovirt-optimizer/ovirt-optimizer.properties ] && sudo sed -i "s/org.ovirt.optimizer.sdk.server=.*/org.ovirt.optimizer.sdk.server=$SETIPADDR/g" /etc/ovirt-optimizer/ovirt-optimizer.properties
 			            fi
                                     echo
                                     echo -ne "Network Configuration \033[32;1mSuccessfully\033[0m. Press any key to continue. " | tee -a $LOGFILE
@@ -318,7 +318,7 @@ if ! [ -z $SETHOSTNAME ]; then
          sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$SETHOSTNAME --otopi-environment="OSETUP_RENAME/forceIgnoreAIAInCA=bool:'True' OVESETUP_CORE/engineStop=bool:'True' OSETUP_RENAME/confirmForceOverwrite=bool:'True'" &>> $LOGFILE
          if [ $? -eq 0 ]; then
             #update ovirt-optimizer configuration
-            sudo sed -i "s/\"baseurl\":.*\//\"baseurl\": \"https:\/\/$SETHOSTNAME\/ovirt-optimizer\/result\//g" /etc/ovirt-engine/ui-plugins/ovirt-optimizer-config.json
+            [ -f /etc/ovirt-engine/ui-plugins/ovirt-optimizer-config.json ] && sudo sed -i "s/\"baseurl\":.*\//\"baseurl\": \"https:\/\/$SETHOSTNAME\/ovirt-optimizer\/result\//g" /etc/ovirt-engine/ui-plugins/ovirt-optimizer-config.json
             echo
             echo -ne "Hostname Configuration \033[32;1mSuccessfully\033[0m. Press any key to continue. " | tee -a $LOGFILE
             read -n1

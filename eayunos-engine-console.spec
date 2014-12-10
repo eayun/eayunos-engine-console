@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
 Version:	0.7
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -58,6 +58,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Dec 10 2014 MaZhe <zhe.ma@eayun.com> 0.7-2
+- Code optimization
+
 * Wed Dec 10 2014 MaZhe <zhe.ma@eayun.com> 0.7-1
 - Update engine-manage-domains/ovirt-optimizer/engine-vm-backup configuration 
   when reset IP/HOSTNAME/admin user's password
