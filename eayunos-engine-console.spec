@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
 Version:	0.8
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -62,6 +62,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Dec 11 2014 MaZhe <zhe.ma@eayun.com> 0.8-3
+- Add update reports configuration file function
+
 * Thu Dec 11 2014 MaZhe <zhe.ma@eayun.com> 0.8-2
 - Update README & HELP
 
