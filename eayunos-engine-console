@@ -584,7 +584,7 @@ while true ; do
          #update vm-backup configuration
          [ -f /etc/engine-vm-backup/engine-vm-backup.properties ] && sudo sed -i "s/^engineSdkPassword=.*/engineSdkPassword=$SETNEWADMPWD/g" /etc/engine-vm-backup/engine-vm-backup.properties
          sudo service engine-vm-backup restart &>> $LOGFILE
-         sudo service ovirt-optimizer restart &> $LOGFILE
+         sudo service ovirt-optimizer restart &>> $LOGFILE
          sudo service ovirt-engine restart &>> $LOGFILE
          if [ $? -eq 0 ]; then
             sudo rm -rf /.eayunos/engineadminpw
