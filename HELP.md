@@ -1,7 +1,7 @@
 #### This is the management tool for EayunOS Engine, you can use it to management the Engine system more convenient and faster.
 =============
 #####Usage:
-* Note: You must initialize the configuration at first login, configuration method : 1-->2-->3-->7(3)-->6, when you complate the configuration, you can browse "http://{Web Portal IP}/ovirt-engine/services/health" to verify the engine status, if the respon is "DB Up!Welcome to Health Status!", the configuration is successfully. 
+* Note: You must initialize the configuration at first login, configuration method : 1-->2-->3-->7(3)-->7(6), when you complate the configuration, you can browse "http://{Web Portal IP}/ovirt-engine/services/health" to verify the engine status, if the respon is "DB Up!Welcome to Health Status!", the configuration is successfully. 
 * When you login the console, you can get the summary infomation of the Engine Appliance:
 ```
     Welcome to the EayunOS 4.1 Engine Appliance.

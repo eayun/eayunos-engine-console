@@ -1026,7 +1026,7 @@ HELP(){
 
 LOGGER $FUNCNAME B
 printf "\033c"
-sudo less /usr/share/doc/eayunos-engine-console/HELP
+sudo less /usr/share/doc/eayunos-engine-console/HELP.md
 LOGGER $FUNCNAME E
 ADV_SET
 

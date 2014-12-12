@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
 Version:	0.8
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -31,7 +31,7 @@ mkdir -p %{buildroot}/usr/share/doc/eayunos-engine-console/
 mkdir -p %{buildroot}/usr/share/eayunos-engine-console/bin/
 cp eayunos-engine-console %{buildroot}/usr/libexec/
 cp README.md %{buildroot}/usr/share/doc/eayunos-engine-console/
-cp HELP %{buildroot}/usr/share/doc/eayunos-engine-console/
+cp HELP.md %{buildroot}/usr/share/doc/eayunos-engine-console/
 cp bin/ovirt-reset-db-password %{buildroot}/usr/share/eayunos-engine-console/bin/
 
 %post
@@ -56,12 +56,15 @@ rm -rf %{buildroot}
 %attr(0755,root,root)/usr/libexec/eayunos-engine-console
 %attr(0755,root,root)/usr/share/eayunos-engine-console/bin/ovirt-reset-db-password
 %doc /usr/share/doc/eayunos-engine-console/README.md
-%doc /usr/share/doc/eayunos-engine-console/HELP
+%doc /usr/share/doc/eayunos-engine-console/HELP.md
 
 
 
 
 %changelog
+* Fri Dec 12 2014 MaZhe <zhe.ma@eayun.com> 0.8-5
+- Update README & HELP Docment
+
 * Fri Dec 12 2014 MaZhe <zhe.ma@eayun.com> 0.8-5
 - Add update reports service configuration files function
   Resolve [issue #21]

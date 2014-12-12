@@ -2,7 +2,7 @@
 =============
 #####使用方法：
 
-* Note：第一次登陆后需要对系统进行初始化配置，配置流程：1-->2-->3-->7(3)-->6，配置完成后浏览器访问"http://{Web Portal IP}/ovirt-engine/services/health"，返回"DB Up!Welcome to Health Status!"说明初始化成功。
+* Note：第一次登陆后需要对系统进行初始化配置，配置流程：1-->2-->3-->7(3)-->7(6)，配置完成后浏览器访问"http://{Web Portal IP}/ovirt-engine/services/health"，返回"DB Up!Welcome to Health Status!"说明初始化成功。
 
 * 登陆到控制台后首先看到的是系统的状态信息：
 
