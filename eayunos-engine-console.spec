@@ -62,7 +62,7 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Fri Dec 12 2014 MaZhe <zhe.ma@eayun.com> 0.8-5
+* Fri Dec 12 2014 MaZhe <zhe.ma@eayun.com> 0.8-6
 - Update README & HELP Docment
 
 * Fri Dec 12 2014 MaZhe <zhe.ma@eayun.com> 0.8-5
