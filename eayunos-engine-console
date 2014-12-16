@@ -696,7 +696,7 @@ if $IFINIT ; then
    #HOSTSNUM=`ovirt-shell -E "list hosts" | grep id | wc -l`
    #verify there have an activing host
    echo "-----------------------------------------------------"
-   echo -n "[1/5]Activing Host. Verifing ... "
+   echo -n "[1/6]Activing Host. Verifing ... "
    ovirt-shell -E 'list hosts --show-all' | grep 'status-state' | grep -q 'up'
    if [ $? -ne 0 ]; then
       echo -e "\033[31;1m[Failed]\033[0m"
@@ -707,7 +707,7 @@ if $IFINIT ; then
    else
       echo -e "\033[32;1m [OK]\033[0m"
       #verify WGT_DOMAIN exsit
-      echo -n "[2/5]WGT_DOMAIN exsit. Verifing ... "
+      echo -n "[2/6]WGT_DOMAIN exsit. Verifing ... "
       ovirt-shell -E "list storagedomains" | grep -q "WGT_DOMAIN"
       if [ $? -ne 0 ]; then
          echo -e "\033[31;1m[Failed]\033[0m"
@@ -718,7 +718,7 @@ if $IFINIT ; then
       else
          echo -e "\033[32;1m [OK]\033[0m"
          #verify WGT_DOMAIN unattached
-         echo -n "[3/5]WGT_DOMAIN unattached. Verifing ... "
+         echo -n "[3/6]WGT_DOMAIN unattached. Verifing ... "
          ovirt-shell -E 'list storagedomains --query "name=WGT_DOMAIN" --show-all' | grep 'status-state' | grep -q 'unattached'
          if [ $? -ne 0 ]; then
             echo -e "\033[31;1m[Failed]\033[0m"
@@ -728,35 +728,55 @@ if $IFINIT ; then
             read -n1
          else
             echo -e "\033[32;1m [OK]\033[0m"
-            #remove old domain
-            echo -n "[4/5]Remove old domain. Removing ... "
-            HOSTID=`ovirt-shell -E "list hosts" | grep id  | head -1 | awk '{print $3}'`
-            ovirt-shell -E "remove storagedomain WGT_DOMAIN --host-id $HOSTID" | grep 'status-state' | grep -q 'complete'
+            #verify WGT_DOMAIN alailable
+            echo -n "[4/6]WGT_DOMAIN available. Verifing ... "
+            TEST_MOUNT_POINT=/mnt/storage_test
+            sudo mkdir -p $TEST_MOUNT_POINT
+            sudo mount $IPADDR:/var/lib/exports/iso $TEST_MOUNT_POINT &>> $LOGFILE
+            sudo -u vdsm touch $TEST_MOUNT_POINT/IO_TEST &>> $LOGFILE
             if [ $? -ne 0 ]; then
+               sudo umount $TEST_MOUNT_POINT &>> $LOGFILE
+               sudo rm -rf $TEST_MOUNT_POINT
                echo -e "\033[31;1m[Failed]\033[0m"
                echo "-----------------------------------------------------"
-               echo "WGT_DOMAIN remove failed."
+               echo "Please check the nfs sharing \"$IPADDR:/var/lib/exports/iso\"."
                echo -n "Press any key to continue. "
-               read -n 1
+               read -n1
             else
+               sudo rm -rf $TEST_MOUNT_POINT/IO_TEST &>> $LOGFILE
+               sudo umount $TEST_MOUNT_POINT &>> $LOGFILE
+               sudo -u vdsm rm -rf $TEST_MOUNT_POINT &>> $LOGFILE
                echo -e "\033[32;1m [OK]\033[0m"
-               #import WGT_DOMAIN
-               echo -n "[5/5]Import WGT_DOMAIN. Importing ... "
-               ovirt-shell -E "add storagedomain --host-id $HOSTID --type iso --storage-type nfs --storage-address $IPADDR --storage-path /var/lib/exports/iso" | grep 'name' | grep -q 'WGT_DOMAIN'
+               #remove old domain
+               echo -n "[5/6]Remove old domain. Removing ... "
+               HOSTID=`ovirt-shell -E "list hosts" | grep id  | head -1 | awk '{print $3}'`
+               ovirt-shell -E "remove storagedomain WGT_DOMAIN --host-id $HOSTID" | grep 'status-state' | grep -q 'complete'
                if [ $? -ne 0 ]; then
                   echo -e "\033[31;1m[Failed]\033[0m"
                   echo "-----------------------------------------------------"
-                  echo "WGT_DOMAIN initialization failed."
+                  echo "WGT_DOMAIN remove failed."
                   echo -n "Press any key to continue. "
-                  read -n1
+                  read -n 1
                else
                   echo -e "\033[32;1m [OK]\033[0m"
-                  echo "-----------------------------------------------------"
-                  echo "WGT_DOMAIN initialization successfully."
-                  echo -n "Press any key to continue. "
-                  read -n1
+                  #import WGT_DOMAIN
+                  echo -n "[6/6]Import WGT_DOMAIN. Importing ... "
+                  ovirt-shell -E "add storagedomain --host-id $HOSTID --type iso --storage-type nfs --storage-address $IPADDR --storage-path /var/lib/exports/iso" | grep 'name' | grep -q 'WGT_DOMAIN'
+                  if [ $? -ne 0 ]; then
+                     echo -e "\033[31;1m[Failed]\033[0m"
+                     echo "-----------------------------------------------------"
+                     echo "WGT_DOMAIN initialization failed."
+                     echo -n "Press any key to continue. "
+                     read -n1
+                  else
+                     echo -e "\033[32;1m [OK]\033[0m"
+                     echo "-----------------------------------------------------"
+                     echo "WGT_DOMAIN initialization successfully."
+                     echo -n "Press any key to continue. "
+                     read -n1
+                  fi
+                  rm -rf ~/.ovirtshellrc
                fi
-               rm -rf ~/.ovirtshellrc
             fi
          fi
       fi
