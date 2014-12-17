@@ -731,7 +731,7 @@ if $IFINIT ; then
             #verify WGT_DOMAIN alailable
             echo -n "[4/6]WGT_DOMAIN available. Verifing ... "
             TEST_MOUNT_POINT=/mnt/storage_test
-            sudo mkdir -p $TEST_MOUNT_POINT
+            sudo mkdir -p $TEST_MOUNT_POINT &>> $LOGFILE
             sudo mount $IPADDR:/var/lib/exports/iso $TEST_MOUNT_POINT &>> $LOGFILE
             sudo -u vdsm touch $TEST_MOUNT_POINT/IO_TEST &>> $LOGFILE
             if [ $? -ne 0 ]; then
