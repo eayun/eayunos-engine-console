@@ -750,7 +750,7 @@ if $IFINIT ; then
                echo -e "\033[32;1m [OK]\033[0m"
                #remove old domain
                echo -n "[5/6]Remove old domain. Removing ... "
-               HOSTID=`ovirt-shell -E "list hosts" | grep id  | head -1 | awk '{print $3}'`
+               HOSTID=`ovirt-shell -E "list hosts  --query status=up" | grep id  | head -1 | awk '{print $3}'`
                ovirt-shell -E "remove storagedomain WGT_DOMAIN --host-id $HOSTID" | grep 'status-state' | grep -q 'complete'
                if [ $? -ne 0 ]; then
                   echo -e "\033[31;1m[Failed]\033[0m"
