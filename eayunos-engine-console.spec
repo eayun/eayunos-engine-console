@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
 Version:	0.8
-Release:	7%{?dist}
+Release:	8%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -62,6 +62,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Dec 23 2014 MaZhe <zhe.ma@eayun.com> 0.8-8
+- Code optimization
+
 * Wed Dec 17 2014 MaZhe <zhe.ma@eayun.com> 0.8-7
 - Fix isodomain "WGT_DOMAIN" initialization failed bug
   Bug fix [issue #23]

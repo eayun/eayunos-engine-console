@@ -530,10 +530,10 @@ while true; do
 #      echo "Engine Restart"
       sudo service ovirt-engine restart &>> $LOGFILE
       if [ $? -eq 0 ]; then
-         echo -n "Engine restart successfully. Press any key to continue."
+         echo -ne "Engine restart \033[32;1mSuccessfully\033[0m. Press any key to continue."
 	 read -n1
       else
-         echo -n "Engine restart failed. Press any key to continue."
+         echo -ne "Engine restart \033[31;1mFailed\033[0m. Press any key to continue."
          read -n1
       fi
       break
@@ -588,16 +588,16 @@ while true ; do
          sudo service ovirt-engine restart &>> $LOGFILE
          if [ $? -eq 0 ]; then
             sudo rm -rf /.eayunos/engineadminpw
-            echo -n "Password change successfully. Press any key to continue."
+            echo -ne "Password change \033[32;1mSuccessfully\033[0m. Press any key to continue."
             read -n1
             break
          else
-            echo -n "Password change failed. Press any key to continue."
+            echo -ne "Password change \033[31;1mFailed\033[0m. Press any key to continue."
             read -n1
             break
          fi
       else
-         echo -n "Password change failed. Press any key to continue."
+         echo -ne "Password change \033[31;1mFailed\033[0m. Press any key to continue."
          read -n1
          break
       fi
@@ -771,7 +771,7 @@ if $IFINIT ; then
                   else
                      echo -e "\033[32;1m [OK]\033[0m"
                      echo "-----------------------------------------------------"
-                     echo "WGT_DOMAIN initialization successfully."
+                     echo -e "WGT_DOMAIN initialization \033[32;1mSuccessfully\033[0m."
                      echo -n "Press any key to continue. "
                      read -n1
                   fi
@@ -822,11 +822,11 @@ while true ; do
       sudo engine-reports-config-passwd --user=admin --password=$SetNewReportsAdmPwd --non-interactive &>> $LOGFILE
       if [ $? -eq 0 ]; then
          sudo rm -rf /.eayunos/reportsadminpw
-         echo -n "Password change successfully. Press any key to continue."
+         echo -ne "Password change \033[32;1mSuccessfully\033[0m. Press any key to continue."
          read -n1
          break
       else
-         echo -n "Password change failed. Press any key to continue."
+         echo -ne "Password change \033[31;1mFailed\033[0m. Press any key to continue."
          read -n1
          break
       fi
@@ -879,9 +879,9 @@ while true; do
    [yY])
       sudo engine-cleanup
       if [ $? -eq 0 ]; then
-         echo "Engine Cleanup Success !"
+         echo -e "Engine Cleanup \033[32;1mSuccessfully\033[0m !"
       else
-         echo "Engine Cleanup Failed !"
+         echo -e "Engine Cleanup \033[31;1mFailed\033[0m !"
       fi
       echo -n "Press any key to continue."
       read -n1
@@ -903,9 +903,9 @@ while true; do
    [yY])
       sudo engine-setup
       if [ $? -eq 0 ]; then
-         echo "Engine Setup Success !"
+         echo -e "Engine Setup \033[32;1mSuccessfully\033[0m !"
       else
-         echo "Engine Setup Failed !"
+         echo -e "Engine Setup \033[31;1mFailed\033[0m !"
       fi
       echo -n "Press any key to continue."
       read -n1
