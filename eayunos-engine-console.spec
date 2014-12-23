@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
 Version:	0.8
-Release:	8%{?dist}
+Release:	9%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -62,6 +62,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Dec 23 2014 MaZhe <zhe.ma@eayun.com> 0.8-9
+- Code optimization
+
 * Tue Dec 23 2014 MaZhe <zhe.ma@eayun.com> 0.8-8
 - Code optimization
 

@@ -575,6 +575,7 @@ while true ; do
       read -n1
       RESET_ADMINPW
    else
+      echo "It will take a while. Please wait. "
       sudo sh -c "echo $SETNEWADMPWD > /.eayunos/newpas" &>> $LOGFILE
       sudo engine-config -s AdminPassword --admin-pass-file=/.eayunos/newpas &>> $LOGFILE
       if [ $? -eq 0 ]; then
