@@ -62,7 +62,7 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Fri Dec 26 2014 MaZhe <zhe.ma@eayun.com> 0.8-10
+* Fri Dec 26 2014 MaZhe <zhe.ma@eayun.com> 0.8-11
 - Fixed issue #24
 
 * Tue Dec 23 2014 MaZhe <zhe.ma@eayun.com> 0.8-10
