@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
 Version:	0.8
-Release:	12%{?dist}
+Release:	13%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -47,6 +47,9 @@ EOF
 service rsyslog restart &> /dev/null
 ln -s /usr/share/eayunos-engine-console/bin/ovirt-reset-db-password /usr/bin/ovirt-reset-db-password
 
+%postun
+rm -rf /usr/bin/ovirt-reset-db-password
+
 %clean
 rm -rf %{buildroot}
 
@@ -62,6 +65,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Dec 26 2014 MaZhe <zhe.ma@eayun.com> 0.8-13
+- Remove symbolic links when uninstall the package
+
 * Fri Dec 26 2014 MaZhe <zhe.ma@eayun.com> 0.8-12
 - Fixed bug
 
