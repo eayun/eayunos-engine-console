@@ -1,6 +1,6 @@
 Name:		eayunos-engine-console
 Version:	0.8
-Release:	13%{?dist}
+Release:	14%{?dist}
 Summary:	Management Tool
 
 Group:		Application
@@ -65,6 +65,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue May 5 2015 PanLiyang <liyang.pan@eayun.com> 0.8-14
+- Change allowOrigins property of emdplugin of rename command
+
 * Fri Dec 26 2014 MaZhe <zhe.ma@eayun.com> 0.8-13
 - Remove symbolic links when uninstall the package
 

@@ -313,6 +313,7 @@ if ! [ -z $SETHOSTNAME ]; then
          sudo sh -c "echo $HOSTSENTRY >> /etc/hosts" 
          # ovirt-engine-rename will be check isodomain on engine host , if isodomain exsit , rename will be failed .
          # this is workaround for rename .
+         sudo sed -i "s/, \"https:\/\/.*\"/, \"https:\/\/$SETHOSTNAME\"/" /usr/share/ovirt-engine/ui-plugins/emdplugin.json
          sudo sed -i "s/^OVESETUP_CONFIG\/fqdn=*./OVESETUP_CONFIG\/fqdn=str:$SETHOSTNAME/g" /etc/ovirt-engine-setup.conf.d/20-setup-ovirt-post.conf
          sudo sed -i "s/^ENGINE_REPORTS_BASE_URL=.*/ENGINE_REPORTS_BASE_URL=https:\/\/$SETHOSTNAME\/ovirt-engine-reports/g" /etc/ovirt-engine/engine.conf.d/10-setup-reports-access.conf
          sudo /usr/share/ovirt-engine/setup/bin/ovirt-engine-rename --newname=$SETHOSTNAME --otopi-environment="OSETUP_RENAME/forceIgnoreAIAInCA=bool:'True' OVESETUP_CORE/engineStop=bool:'True' OSETUP_RENAME/confirmForceOverwrite=bool:'True'" &>> $LOGFILE
